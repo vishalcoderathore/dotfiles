@@ -1,0 +1,18 @@
+# 🖋️ Set Font
+font_family JetBrainsMono Nerd Font
+font_size 12
+
+# 🎨 Colors
+background #161921
+foreground #deddda
+cursor #aaaaaa
+
+# ⏫ Scrollback Buffer (Keeps Terminal History)
+scrollback_lines 10000
+
+# 🖼️ Window Padding
+window_padding_width 5
+
+# 🖱️ Enable Right-Click Context Menu (Custom)
+map ctrl+shift+right click launch --type=overlay kitty +kitten kitty_shell
+
