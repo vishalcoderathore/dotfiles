@@ -165,6 +165,7 @@ alias ic="$HOME/.ssh/instanceTunnel.sh"
 alias vi="nvim"
 alias bat="batcat"
 alias vis='nvim $(fzf --preview="batcat --color=always {}")'
+alias ldo="lazydocker"
 
 # Yazi Setup
 function y() {
