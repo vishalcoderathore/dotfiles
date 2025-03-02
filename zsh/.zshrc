@@ -186,3 +186,5 @@ export TERM=xterm-256color
 # Adding typescript language server to PATH
 export PATH="$PATH:$(npm bin -g)"
 
+# Adding Homebrew
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
