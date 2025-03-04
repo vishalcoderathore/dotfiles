@@ -138,6 +138,10 @@ export NVM_DIR="$HOME/.nvm"
 # Add .NET tools to PATH
 export PATH="$HOME/.dotnet/tools:$PATH"
 
+# Add rbenv
+export PATH="$HOME/.rbenv/bin:$PATH"
+eval "$(rbenv init -)"
+
 # Setup default Node Version
 function change_node_version {
 	nvmrc="./.nvmrc"
