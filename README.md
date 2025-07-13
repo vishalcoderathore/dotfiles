@@ -21,19 +21,31 @@ I use **Homebrew** as my package manager for installing CLI tools. Below is a li
   brew install yazi
   
 ### Kitty
-kitty (terminal emulator) → Installed via:
-- Installed into ~/.local/bin/kitty
-- To update, rerun the same command.
-   ```sh
-   curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin
-
+kitty (terminal emulator) → Installed via Cosmic Store
+#### Install flathub
+```bash
+  flatpak install flathub
+```
+#### Install Kitty
+- Install Kitty from Cosmic Store
+#### Grant access to your dotfiles
+```bash
+flatpak override --user io.kitty.Kitty --filesystem=~/.config/kitty:ro
+```
+#### Link Kitty Configs (Need to have dotfiles repo first)
+```bash
+cd ~/dotfiles
+stow kitty
+```
+#### Set kitty as default for Win+t
+- Open keyboard shortcuts > Custom shortcuts and kitty
+- ![img_1.png](img_1.png)
 
 ### Snap
 | Package       | Install Command                             |
 |---------------|---------------------------------------------|
 | datagrip | snap install datagrip --classic             |
 | nvim | Csnap install nvim --classic                |
-| postman | snap install postman                        |
 | pycharm-professional | snap install pycharm-professional --classic |
 | rider | snap install rider --classic                |
 | rubymine | snap install rubymine --classic             |
@@ -71,6 +83,7 @@ I then use stow to create symlinks for specific applications:
 stow lazydocker
 stow yarn
 stow yazi
+stow kitty
 ```
 This automatically symlinks the configurations from ~/.dotfiles/ into the corresponding locations inside ~/.config/.
 
