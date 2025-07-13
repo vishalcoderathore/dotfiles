@@ -26,12 +26,9 @@ kitty (terminal emulator) → Installed via Cosmic Store
 ```bash
   flatpak install flathub
 ```
-#### Install Kitty
+#### Install Kitty (note that Cosmic Store doesn't offer Flathub version just yet)
 - Install Kitty from Cosmic Store
-#### Grant access to your dotfiles
-```bash
-flatpak override --user io.kitty.Kitty --filesystem=~/.config/kitty:ro
-```
+
 #### Link Kitty Configs (Need to have dotfiles repo first)
 ```bash
 cd ~/dotfiles
