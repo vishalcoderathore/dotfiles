@@ -4,13 +4,13 @@ return function(config)
     config.keys = {
         -- Split top & bottom (horizontal layout)
         {
-            key = 'J',
+            key = 'H',
             mods = 'CTRL|SHIFT',
             action = wezterm.action.SplitVertical { domain = 'CurrentPaneDomain' },
         },
         -- Split side by side (vertical layout)
         {
-            key = 'F',
+            key = 'J',
             mods = 'CTRL|SHIFT',
             action = wezterm.action.SplitHorizontal { domain = 'CurrentPaneDomain' },
         },

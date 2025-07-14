@@ -40,11 +40,18 @@ return function(config)
     config.prefer_egl = true
     config.max_fps = 120
 
+    -- Cursor
+    config.default_cursor_style = "BlinkingBlock"
+    config.cursor_blink_rate = 500
+    config.cursor_blink_ease_in = "Constant"
+    config.cursor_blink_ease_out = "Constant"
+
     -- Default size
-    config.initial_rows = 32       -- Height (e.g., 32 lines tall)
-    config.initial_cols = 120      -- Width (e.g., 120 characters wide)
     config.window_close_confirmation = "NeverPrompt"
 
-
-
+    -- Make Wezterm fullscreen
+    wezterm.on("gui-startup", function(cmd)
+        local tab, pane, window = wezterm.mux.spawn_window(cmd or {})
+        window:gui_window():maximize()
+    end)
 end
