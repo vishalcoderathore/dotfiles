@@ -20,23 +20,25 @@ I use **Homebrew** as my package manager for installing CLI tools. Below is a li
   ```sh
   brew install yazi
   
-### Kitty
-kitty (terminal emulator) → Installed via Cosmic Store
+### Wezterm
+Wezterm (terminal emulator) → Installed via Cosmic Store
 #### Install flathub
 ```bash
   flatpak install flathub
 ```
-#### Install Kitty (note that Cosmic Store doesn't offer Flathub version just yet)
-- Install Kitty from Cosmic Store
+#### Install Wezterm
+- Install Wezterm from Cosmic Store
 
-#### Link Kitty Configs (Need to have dotfiles repo first)
+#### Link Wezterm Configs (Need to have dotfiles repo first)
 ```bash
 cd ~/dotfiles
-stow kitty
+stow wezterm
 ```
-#### Set kitty as default for Win+t
+#### Set Wezterm as default for Win+t
 - Open keyboard shortcuts > Custom shortcuts and kitty
-- ![img_1.png](img_1.png)
+  - Name : ```Wezterm```
+  - Command : ```flatpak run org.wezfurlong.wezterm```
+- ![img_3.png](img_3.png)
 
 ### Snap
 | Package       | Install Command                             |
@@ -81,6 +83,7 @@ stow lazydocker
 stow yarn
 stow yazi
 stow kitty
+stow wezterm
 ```
 This automatically symlinks the configurations from ~/.dotfiles/ into the corresponding locations inside ~/.config/.
 
