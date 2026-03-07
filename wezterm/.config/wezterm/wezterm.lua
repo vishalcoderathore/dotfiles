@@ -1,6 +1,8 @@
 local wezterm = require 'wezterm'
 local config = wezterm.config_builder()
 
+config.enable_wayland = true
+
 -- Load partials
 require("font")(config)
 require("appearance")(config)
