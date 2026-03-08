@@ -31,11 +31,11 @@ return function(config)
         bottom = 2,
     }
 
-    config.window_decorations = "TITLE | RESIZE"
-    config.use_fancy_tab_bar = false
+    config.window_decorations = "RESIZE"
+    config.use_fancy_tab_bar = true
     config.enable_tab_bar = true
     config.hide_tab_bar_if_only_one_tab = false
-    config.tab_bar_at_bottom = true
+    config.tab_bar_at_bottom = false
     config.enable_scroll_bar = true
     config.prefer_egl = true
     config.max_fps = 120
