@@ -37,7 +37,7 @@ return function(config)
     config.hide_tab_bar_if_only_one_tab = false
     config.tab_bar_at_bottom = true
     config.enable_scroll_bar = true
-    config.prefer_egl = false
+    config.prefer_egl = true
     config.max_fps = 120
 
     -- Cursor

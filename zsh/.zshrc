@@ -170,6 +170,7 @@ alias vi="nvim"
 alias bat="batcat"
 alias vis='nvim $(fzf --preview="batcat --color=always {}")'
 alias ldo="lazydocker"
+alias update-joplin='wget -O - https://raw.githubusercontent.com/laurent22/joplin/dev/Joplin_install_and_update.sh | bash'
 
 # Yazi Setup
 function y() {
