@@ -135,8 +135,9 @@ export GIT_SSH_COMMAND='ssh'
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-# Add .NET tools to PATH
-export PATH="$HOME/.dotnet/tools:$PATH"
+# Add .NET SDK and tools to PATH
+export DOTNET_ROOT="$HOME/.dotnet"
+export PATH="$HOME/.dotnet:$HOME/.dotnet/tools:$PATH"
 
 # Add rbenv
 export PATH="$HOME/.rbenv/bin:$PATH"
