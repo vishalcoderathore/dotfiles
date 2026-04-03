@@ -17,6 +17,7 @@ return {
       integrations = {
         treesitter = true,
         nvimtree = true,
+        lualine = true,
         native_lsp = {
           enabled = true,
           underlines = {

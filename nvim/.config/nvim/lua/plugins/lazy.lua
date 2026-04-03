@@ -39,4 +39,7 @@ require("lazy").setup({
 
   -- Theme
   require("plugins.theme"),
+
+  -- Statusline
+  require("plugins.statusline"),
 })
