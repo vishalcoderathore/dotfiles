@@ -22,12 +22,9 @@ require("lazy").setup({
     build = ":TSUpdate",
   },
 
-  -- LSP support
-  "neovim/nvim-lspconfig",
-
-  -- null-ls for ESLint and Prettier integration
+  -- none-ls for ESLint and Prettier integration (community fork of null-ls)
   {
-    "jose-elias-alvarez/null-ls.nvim",
+    "nvimtools/none-ls.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
   },
 
