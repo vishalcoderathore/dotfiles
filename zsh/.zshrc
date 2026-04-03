@@ -86,7 +86,7 @@ export PATH=$HOME/.local/bin:$PATH
 source $ZSH/oh-my-zsh.sh
 
 # Set Oh My Posh as the prompt
-eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/multiverse-neon.omp.json)"
+eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/jandedobbeleer.omp.json)"
 
 
 # User configuration
