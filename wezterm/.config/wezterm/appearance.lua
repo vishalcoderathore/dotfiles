@@ -4,20 +4,20 @@ local theme_light = require 'theme_light'
 
 return function(config)
     config.color_schemes = {
-        ['Ayu Mirage Dark'] = theme_dark,
-        ['Ayu Mirage Light'] = theme_light,
+        ['Catppuccin Mocha'] = theme_dark,
+        ['Catppuccin Latte'] = theme_light,
     }
 
     local function scheme_for_appearance(appearance)
         if appearance:find 'Dark' then
-            return 'Ayu Mirage Dark'
+            return 'Catppuccin Mocha'
         else
-            return 'Ayu Mirage Light'
+            return 'Catppuccin Latte'
         end
     end
 
     --config.color_scheme = scheme_for_appearance(wezterm.gui.get_appearance())
-    config.color_scheme = 'Ayu Mirage Dark'
+    config.color_scheme = 'Catppuccin Mocha'
 
     config.inactive_pane_hsb = {
         saturation = 1.0,

@@ -1,30 +1,30 @@
--- theme_dark.lua - Catppuccin Macchiato (matching Terminator config)
+-- theme_dark.lua - Catppuccin Mocha
 return {
-    foreground = '#CAD3F5',
-    background = '#24273A',
-    cursor_bg = '#F4DBD6',
-    cursor_border = '#F4DBD6',
-    cursor_fg = '#24273A',
-    selection_bg = '#5B6078',
-    selection_fg = '#CAD3F5',
+    foreground = '#CDD6F4',
+    background = '#1E1E2E',
+    cursor_bg = '#F5E0DC',
+    cursor_border = '#F5E0DC',
+    cursor_fg = '#1E1E2E',
+    selection_bg = '#585B70',
+    selection_fg = '#CDD6F4',
     ansi = {
-        '#494D64', -- black
-        '#ED8796', -- red
-        '#A6DA95', -- green
-        '#EED49F', -- yellow
-        '#8AADF4', -- blue
-        '#F5BDE6', -- magenta
-        '#8BD5CA', -- cyan
-        '#B8C0E0', -- white
+        '#45475A', -- black (Surface 1)
+        '#F38BA8', -- red
+        '#A6E3A1', -- green
+        '#F9E2AF', -- yellow
+        '#89B4FA', -- blue
+        '#F5C2E7', -- magenta (Pink)
+        '#94E2D5', -- cyan (Teal)
+        '#BAC2DE', -- white (Subtext 1)
     },
     brights = {
-        '#5B6078', -- bright black
-        '#ED8796', -- bright red
-        '#A6DA95', -- bright green
-        '#EED49F', -- bright yellow
-        '#8AADF4', -- bright blue
-        '#F5BDE6', -- bright magenta
-        '#8BD5CA', -- bright cyan
-        '#A5ADCB', -- bright white
+        '#585B70', -- bright black (Surface 2)
+        '#F38BA8', -- bright red
+        '#A6E3A1', -- bright green
+        '#F9E2AF', -- bright yellow
+        '#89B4FA', -- bright blue
+        '#F5C2E7', -- bright magenta
+        '#94E2D5', -- bright cyan
+        '#A6ADC8', -- bright white (Subtext 0)
     },
 }
