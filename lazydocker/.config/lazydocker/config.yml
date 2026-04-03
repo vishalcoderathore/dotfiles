@@ -1,0 +1,20 @@
+# Catppuccin Mocha theme — matches WezTerm color scheme
+gui:
+  theme:
+    activeBorderColor:
+      - '#89B4FA'   # Blue
+      - bold
+    inactiveBorderColor:
+      - '#585B70'   # Surface 2
+    selectedLineBgColor:
+      - '#313244'   # Surface 0 (selection highlight)
+    optionsTextColor:
+      - '#89B4FA'   # Blue
+    headerFgColor:
+      - '#CDD6F4'   # Foreground (Text)
+    unstagedChangesColor:
+      - '#F38BA8'   # Red
+    defaultFgColor:
+      - '#CDD6F4'   # Foreground (Text)
+    searchingActiveBorderColor:
+      - '#F9E2AF'   # Yellow

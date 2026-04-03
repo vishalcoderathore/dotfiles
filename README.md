@@ -44,10 +44,30 @@ stow wezterm
 | Package       | Install Command                             |
 |---------------|---------------------------------------------|
 | datagrip | snap install datagrip --classic             |
-| nvim | Csnap install nvim --classic                |
+| nvim | snap install nvim --classic                |
 | pycharm-professional | snap install pycharm-professional --classic |
 | rider | snap install rider --classic                |
 | rubymine | snap install rubymine --classic             |
+
+### Kitty
+Kitty (terminal emulator) → Installed via snap or system package manager:
+```sh
+sudo apt install kitty
+```
+#### Link Kitty Configs
+```bash
+cd ~/dotfiles
+stow kitty
+```
+
+### Neovim
+Neovim → Installed via snap (see Snap table above).
+#### Link Neovim Configs
+```bash
+cd ~/dotfiles
+stow nvim
+```
+Config uses [lazy.nvim](https://github.com/folke/lazy.nvim) as the plugin manager, with Treesitter and LSP (ESLint, Prettier) configured.
 
 ---
 
@@ -84,8 +104,10 @@ stow yarn
 stow yazi
 stow kitty
 stow wezterm
+stow nvim
+stow zsh
 ```
-This automatically symlinks the configurations from ~/.dotfiles/ into the corresponding locations inside ~/.config/.
+This automatically symlinks the configurations from `~/dotfiles/` into the corresponding locations inside `~/.config/` (and `~` for dotfiles like `.zshrc`).
 
 ---
 
@@ -122,3 +144,29 @@ Firefox Developer Edition is not available in most package managers or app store
   sudo rm -rf /opt/firefox-developer
   sudo rm -f /opt/firefox-developer.tar.bz2
   sudo rm -f /usr/local/bin/firefox-developer
+
+---
+
+## 🐚 Zsh
+Shell configuration managed via [Oh My Zsh](https://ohmyzsh.com) with the following setup:
+- **Prompt**: Oh My Posh (`multiverse-neon` theme)
+- **Plugins**: `git`, `zsh-autosuggestions`, `fast-syntax-highlighting`
+- **Tools integrated**: NVM, rbenv, RVM, fzf, Homebrew, .NET SDK, Rust (cargo)
+- **Notable aliases**: `vi` → nvim, `ls` → lsd, `bat` → batcat, `ldo` → lazydocker, `y` → yazi (with cwd-tracking)
+
+#### Link Zsh Config
+```bash
+cd ~/dotfiles
+stow zsh
+```
+
+---
+
+## 🗂 Yazi
+Yazi (terminal file manager) → Installed via Homebrew (see above). Config uses the **Catppuccin Frappé** flavor.
+
+#### Link Yazi Configs
+```bash
+cd ~/dotfiles
+stow yazi
+```
