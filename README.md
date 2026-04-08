@@ -162,6 +162,26 @@ stow zsh
 
 ---
 
+## 🤖 Claude Code
+
+Claude Code CLI configuration managed via stow.
+
+**Tracked files:**
+- `settings.json` — main settings (model, status line, permissions)
+- `keybindings.json` — custom keybindings
+- `statusline-command.sh` — status line script
+- `skills/` — custom skills
+
+**Not tracked** (machine-specific or sensitive): `.credentials.json`, `history.jsonl`, `sessions/`, `projects/`, `settings.local.json`
+
+#### Link Claude Configs
+```bash
+cd ~/dotfiles
+stow claude
+```
+
+---
+
 ## 🗂 Yazi
 Yazi (terminal file manager) → Installed via Homebrew (see above). Config uses the **Catppuccin Frappé** flavor.
 
