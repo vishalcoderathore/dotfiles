@@ -168,6 +168,7 @@ alias ls="lsd"
 alias n="nnn"
 alias ic="$HOME/.ssh/instanceTunnel.sh"
 alias vi="nvim"
+alias clr="clear"
 alias bat="batcat"
 alias vis='nvim $(fzf --preview="batcat --color=always {}")'
 alias ldo="lazydocker"
