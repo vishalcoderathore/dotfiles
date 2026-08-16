@@ -40,6 +40,20 @@ stow wezterm
   - Command : ```flatpak run org.wezfurlong.wezterm```
 - ![img_3.png](img_3.png)
 
+#### Alt+1 conflict with Neovim
+WezTerm binds `ALT+1`–`ALT+8` to `ActivateTab` **by default**. Assigning `config.keys` adds to
+those defaults rather than replacing them, so `Alt+1` never reaches Neovim — which the LazyVim
+config maps to the Snacks file explorer. To let it through, add to `keys.lua`:
+```lua
+{
+    key = '1',
+    mods = 'ALT',
+    action = wezterm.action.SendKey { key = '1', mods = 'ALT' },
+},
+```
+Alternatively bind a different key in Neovim, or set
+`config.disable_default_key_bindings = true` and re-declare the bindings worth keeping.
+
 ### Snap
 | Package       | Install Command                             |
 |---------------|---------------------------------------------|
@@ -61,13 +75,49 @@ stow kitty
 ```
 
 ### Neovim
-Neovim → Installed via snap (see Snap table above).
+Neovim → Installed via snap (see Snap table above). Requires **0.11.2+**; the snap tracks a
+current release (0.12.x), which the Ubuntu apt package (0.9.5) does not satisfy.
+
 #### Link Neovim Configs
 ```bash
 cd ~/dotfiles
 stow nvim
 ```
-Config uses [lazy.nvim](https://github.com/folke/lazy.nvim) as the plugin manager, with Treesitter and LSP (ESLint, Prettier) configured.
+
+Config is [LazyVim](https://lazyvim.org) on top of
+[lazy.nvim](https://github.com/folke/lazy.nvim), with **Catppuccin Mocha** as the colorscheme.
+`lazy-lock.json` is tracked, so plugin revisions are reproducible across machines.
+
+**Layout:**
+```
+nvim/.config/nvim/
+├── lazyvim.json            # which LazyVim extras are enabled
+├── lsp/easy_dotnet.lua     # Roslyn inlay hints + Neovim file watching
+├── after/ftplugin/cs.lua   # C#: 4-space indent, no format-on-save
+└── lua/
+    ├── config/             # options, keymaps, lazy bootstrap
+    └── plugins/            # dotnet, markdown, python, personal (theme/lualine/gitsigns)
+```
+
+**Enabled extras:** `lang.typescript`, `lang.python`, `lang.json`, `lang.yaml`,
+`lang.markdown`, `linting.eslint`, `formatting.prettier`, `dap.core`, `test.core`.
+
+**Deliberate exclusions** — do not re-add without reason: OmniSharp (EasyDotnet's Roslyn is
+used instead), `neotest-vstest`, Marksman, `markdownlint-cli2`, and
+`markdown-preview.nvim` (vulnerable Socket.IO dependency tree).
+
+#### External tooling this config expects
+`ripgrep`, `fd`, `fzf`, `lazygit`, a C compiler (`build-essential`), Node LTS, Python 3 +
+venv, and the .NET SDK. Language servers and formatters are managed by Mason, not installed
+globally. The C#/Blazor profile additionally uses two global .NET tools:
+```bash
+dotnet tool install -g easydotnet
+dotnet tool install -g roslyn-language-server --prerelease
+```
+
+> **Note:** WezTerm binds `Alt+1`–`Alt+8` to tab switching by default, which swallows the
+> `<M-1>` file-explorer mapping in this config. Setting `config.keys` does not disable
+> WezTerm's defaults — see the Alt+1 note in the WezTerm section.
 
 ---
 
