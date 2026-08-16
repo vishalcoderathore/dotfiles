@@ -183,10 +183,31 @@ stow claude
 ---
 
 ## 🗂 Yazi
-Yazi (terminal file manager) → Installed via Homebrew (see above). Config uses the **Catppuccin Frappé** flavor.
+Yazi (terminal file manager) → Installed via Homebrew (see above).
+
+**Tracked files:**
+- `theme.toml` — sets the dark flavor to **Catppuccin Mocha**
+- `package.toml` — flavor dependency, managed by `ya pkg` (`yazi-rs/flavors:catppuccin-mocha`)
+- `flavors/catppuccin-mocha.yazi/` — the vendored flavor package itself
+- `yazi.toml`, `keymap.toml` — stock upstream defaults, kept in-repo so the config is self-contained
+
+Since `yazi.toml`/`keymap.toml` are unmodified defaults, the notable behaviour is all upstream: 1:4:3 pane ratio, alphabetical case-insensitive sort with directories first, hidden files off, vim-style navigation, `z`/`Z` for zoxide/fzf jumps, `s`/`S` to search by name (fd) or content (ripgrep).
 
 #### Link Yazi Configs
 ```bash
 cd ~/dotfiles
 stow yazi
+```
+
+#### Shell Integration
+`.zshrc` defines a `y` function that wraps yazi with `--cwd-file`, so quitting drops the shell in the last directory you browsed.
+
+#### Changing the Flavor
+```bash
+ya pkg add yazi-rs/flavors:<name>   # fetch into flavors/
+```
+Then point `theme.toml` at it:
+```toml
+[flavor]
+dark = "<name>"
 ```
