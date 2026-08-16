@@ -7,6 +7,12 @@
 return {
   {
     "GustavEikaas/easy-dotnet.nvim",
+    -- Only load inside a .NET project. Plugins declared here inherit
+    -- `defaults.lazy = false` from config/lazy.lua, so without these triggers
+    -- this loads on every launch -- and drags nvim-dap, plenary and snacks in
+    -- with it as dependencies, pulling the whole DAP stack into startup.
+    ft = { "cs", "razor" },
+    cmd = "Dotnet",
     dependencies = {
       "nvim-lua/plenary.nvim",
       "mfussenegger/nvim-dap",
