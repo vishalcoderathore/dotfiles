@@ -40,15 +40,6 @@ stow wezterm
   - Command : ```flatpak run org.wezfurlong.wezterm```
 - ![img_3.png](img_3.png)
 
-#### Alt+1 and Neovim
-`Alt+1` is **not** bound by WezTerm — verified with `wezterm show-keys`, which lists no
-`ALT+<digit>` assignment. Direct tab access is `CTRL+SHIFT+<n>` or `SUPER+<n>`, so `Alt+1`
-passes through to the terminal application, where the Neovim config maps `<M-1>` to the
-Snacks file explorer.
-
-If `Alt+1` ever stops reaching Neovim, check what the terminal actually sends: in insert mode
-press `Ctrl+V` then `Alt+1`. An `^[1` means the ESC-prefix encoding is arriving correctly.
-
 ### Snap
 | Package       | Install Command                             |
 |---------------|---------------------------------------------|
@@ -110,8 +101,7 @@ dotnet tool install -g easydotnet
 dotnet tool install -g roslyn-language-server --prerelease
 ```
 
-**Keymap:** `Alt+1` toggles the Snacks file explorer. See the Alt+1 note in the WezTerm
-section for how to debug it if the key ever stops arriving.
+**Keymap:** `<leader>e` toggles the Snacks file explorer (LazyVim default).
 
 ---
 
