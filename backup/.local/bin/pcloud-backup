@@ -1,0 +1,245 @@
+#!/usr/bin/env bash
+#
+# pcloud-backup — mirror pCloud onto the external "Backup" drive via rclone.
+#
+#   pcloud-backup            sync pCloud -> Backup drive
+#   pcloud-backup --dry-run  show what would change, touch nothing
+#   pcloud-backup --verify   checksum every file already on the drive
+#   pcloud-backup --help
+#
+# Deleted/overwritten files are moved into pcloud-archive/<date>/ rather than
+# being destroyed, so an accidental deletion on pCloud is always recoverable.
+#
+# Destination defaults to /media/$USER/Backup. Override with PCLOUD_BACKUP_ROOT
+# and PCLOUD_BACKUP_LABEL. See README.md in this stow package for setup.
+
+set -euo pipefail
+
+# ---------------------------------------------------------------- settings --
+
+REMOTE="${PCLOUD_REMOTE:-pcloud:}"
+DEST_LABEL="${PCLOUD_BACKUP_LABEL:-Backup}"   # drive must carry this label, or we refuse
+DEST_ROOT="${PCLOUD_BACKUP_ROOT:-/media/${USER:-$(id -un)}/$DEST_LABEL}"
+DEST="$DEST_ROOT/pcloud"
+ARCHIVE_ROOT="$DEST_ROOT/pcloud-archive"
+
+# Stage 2. The dotfiles repo carries this script and its runbook, so copying it
+# onto the drive is what makes the drive self-sufficient: recoverable without
+# either the laptop or GitHub. Public config only — never point this at
+# ~/.ssh, ~/.gnupg or ~/.aws while the drive is unencrypted.
+DOTFILES_SRC="${PCLOUD_BACKUP_DOTFILES:-$HOME/dotfiles}"
+DOTFILES_DEST="$DEST_ROOT/laptop/dotfiles"
+
+STATE_DIR="$HOME/.local/share/pcloud-backup"
+LOG_DIR="$STATE_DIR/logs"
+LOCK_FILE="$STATE_DIR/lock"
+KEEP_LOGS=30
+
+# Paths not worth (or not possible) to back up.
+#   Crypto Folder — pCloud Crypto, client-side encrypted; the API cannot read it
+EXCLUDES=(
+  "/Crypto Folder/**"
+  "/.Trash-1000/**"
+  ".DS_Store"
+  "Thumbs.db"
+)
+
+# exFAT rejects  \ : ? * | < > "  and trailing dots/spaces in filenames.
+# rclone swaps them for full-width lookalikes on write and restores them on
+# read, so a round-trip back to pCloud is lossless.
+EXFAT_ENCODING="Slash,BackSlash,Colon,Question,Asterisk,Pipe,LtGt,DoubleQuote,Dot,RightPeriod,RightSpace,Ctl,InvalidUtf8"
+
+# ------------------------------------------------------------------ output --
+
+if [[ -t 1 ]]; then
+  C_RESET=$'\033[0m'; C_DIM=$'\033[2m'; C_RED=$'\033[31m'
+  C_GREEN=$'\033[32m'; C_YELLOW=$'\033[33m'; C_BOLD=$'\033[1m'
+else
+  C_RESET=''; C_DIM=''; C_RED=''; C_GREEN=''; C_YELLOW=''; C_BOLD=''
+fi
+
+info() { printf '%s==>%s %s\n' "$C_BOLD" "$C_RESET" "$*"; }
+ok()   { printf '%s  ok%s  %s\n' "$C_GREEN" "$C_RESET" "$*"; }
+warn() { printf '%swarn%s  %s\n' "$C_YELLOW" "$C_RESET" "$*" >&2; }
+die()  { printf '%sfail%s  %s\n' "$C_RED" "$C_RESET" "$*" >&2; exit 1; }
+
+usage() {
+  # Print the header comment block (everything after the shebang that is still
+  # a comment), so this never drifts out of sync with edits above.
+  awk 'NR==1 {next} /^#/ {sub(/^# ?/,""); print; next} {exit}' "$0"
+  exit 0
+}
+
+human() { numfmt --to=iec --suffix=B "$1" 2>/dev/null || echo "$1 bytes"; }
+
+# ---------------------------------------------------------------- preflight --
+
+preflight() {
+  command -v rclone >/dev/null 2>&1 \
+    || die "rclone is not installed or not on PATH."
+
+  rclone listremotes 2>/dev/null | grep -qx "$REMOTE" \
+    || die "rclone remote '$REMOTE' is not configured. Run: rclone config"
+
+  # The destination must be a real mount. Without this check, an unplugged
+  # drive turns /media/vishal/Backup back into an ordinary empty directory
+  # on the root filesystem, and the sync would happily fill up /.
+  mountpoint -q "$DEST_ROOT" \
+    || die "$DEST_ROOT is not a mountpoint — the Backup drive isn't plugged in."
+
+  local dev fstype label
+  dev="$(findmnt -no SOURCE --target "$DEST_ROOT")"
+  fstype="$(findmnt -no FSTYPE --target "$DEST_ROOT")"
+  label="$(lsblk -no LABEL "$dev" 2>/dev/null | head -1 | xargs)"
+
+  [[ "$label" == "$DEST_LABEL" ]] \
+    || die "$DEST_ROOT is $dev labelled '${label:-<none>}', expected '$DEST_LABEL'. Refusing to write to the wrong disk."
+
+  [[ -w "$DEST_ROOT" ]] || die "$DEST_ROOT is not writable."
+
+  ok "destination $dev ($fstype, label '$label') mounted at $DEST_ROOT"
+
+  # Reachability + a rough capacity sanity check.
+  local used avail
+  used="$(rclone about "$REMOTE" --json 2>/dev/null | grep -oP '"used":\s*\K[0-9]+' || true)"
+  [[ -n "$used" ]] || die "cannot reach $REMOTE — check your network and 'rclone config reconnect ${REMOTE%:}:'"
+
+  avail=$(( $(df -B1 --output=avail "$DEST_ROOT" | tail -1) ))
+  ok "pCloud holds $(human "$used"); drive has $(human "$avail") free"
+
+  if (( avail < used )); then
+    warn "free space is below pCloud's total size. Fine if the drive already holds most of it, but a first full sync would run out."
+  fi
+}
+
+# -------------------------------------------------------------------- flags --
+
+common_flags() {
+  local f=(
+    --local-encoding "$EXFAT_ENCODING"
+    # One recursive listing instead of a walk per directory. Measured A/B on
+    # this tree (47k files): a no-op sync goes ~19.7s -> ~16.2s, for ~70 MB
+    # more RAM (85 -> 157 MB RSS). Modest, but free. Stage 2 ignores it: the
+    # local backend has no recursive-list operation.
+    --fast-list
+    --modify-window 1s
+    --transfers 8
+    --checkers 16
+    --retries 3
+    --low-level-retries 10
+    --contimeout 60s
+    --timeout 5m
+    --log-file "$LOG_FILE"
+    --log-level INFO
+    --stats 30s
+    # No --stats-one-line: it collapses rclone's end-of-run block into a single
+    # progress line, and the summary printed at the bottom of this script is
+    # parsed out of exactly that block.
+  )
+  local e
+  for e in "${EXCLUDES[@]}"; do f+=(--exclude "$e"); done
+  [[ -n "${PCLOUD_BWLIMIT:-}" ]] && f+=(--bwlimit "$PCLOUD_BWLIMIT")
+  printf '%s\n' "${f[@]}"
+}
+
+# --------------------------------------------------------------------- main --
+
+MODE="sync"
+case "${1:-}" in
+  "")                      MODE="sync" ;;
+  -n|--dry-run)            MODE="dryrun" ;;
+  --verify)                MODE="verify" ;;
+  -h|--help)               usage ;;
+  *)                       die "unknown option '$1' (try --help)" ;;
+esac
+
+mkdir -p "$LOG_DIR"
+STAMP="$(date +%Y-%m-%d_%H%M%S)"
+LOG_FILE="$LOG_DIR/${MODE}_${STAMP}.log"
+
+# Only one run at a time — two concurrent syncs sharing a --backup-dir would
+# fight over the same files.
+exec 9>"$LOCK_FILE"
+flock -n 9 || die "another pcloud-backup run is already in progress."
+
+preflight
+
+mapfile -t FLAGS < <(common_flags)
+START=$(date +%s)
+
+case "$MODE" in
+  verify)
+    [[ -d "$DEST" ]] || die "$DEST does not exist yet — run a sync first."
+    info "Checksumming every file on the drive against pCloud."
+    info "This reads all ${C_DIM}$(human "$(du -sb "$DEST" 2>/dev/null | cut -f1)")${C_RESET} back off the disk and will take a while."
+    set +e
+    rclone check "$REMOTE" "$DEST" "${FLAGS[@]}" --checksum
+    RC=$?
+    set -e
+    ;;
+
+  dryrun|sync)
+    ARCHIVE_DIR="$ARCHIVE_ROOT/$(date +%Y-%m-%d)"
+    RUN=(rclone sync "$REMOTE" "$DEST" "${FLAGS[@]}"
+         --backup-dir "$ARCHIVE_DIR"
+         --create-empty-src-dirs)
+
+    if [[ "$MODE" == "dryrun" ]]; then
+      info "Dry run — nothing will be written."
+      RUN+=(--dry-run --log-level INFO)
+    else
+      info "Syncing $REMOTE -> $DEST"
+      info "Replaced/deleted files go to ${ARCHIVE_DIR#$DEST_ROOT/}"
+      mkdir -p "$DEST"
+    fi
+
+    set +e
+    "${RUN[@]}"
+    RC=$?
+    set -e
+
+    # Stage 2 — the dotfiles repo. Tiny next to the cloud mirror, and it is what
+    # lets the drive rebuild a machine on its own: the sync script and its
+    # runbook travel with the backup instead of only living on the laptop.
+    if [[ -d "$DOTFILES_SRC" ]]; then
+      info "Syncing $DOTFILES_SRC -> $DOTFILES_DEST"
+      DRUN=(rclone sync "$DOTFILES_SRC" "$DOTFILES_DEST" "${FLAGS[@]}"
+            --backup-dir "$DEST_ROOT/laptop-archive/$(date +%Y-%m-%d)")
+      [[ "$MODE" == "dryrun" ]] && DRUN+=(--dry-run)
+      set +e
+      "${DRUN[@]}"
+      DRC=$?
+      set -e
+      (( RC == 0 )) && RC=$DRC
+    else
+      warn "$DOTFILES_SRC not found — skipping dotfiles stage."
+    fi
+    ;;
+esac
+
+ELAPSED=$(( $(date +%s) - START ))
+
+# rclone's own end-of-run tallies, pulled back out of the log.
+printf '\n'
+grep -E "^(Transferred|Checks|Deleted|Errors|Renamed):" "$LOG_FILE" | tail -8 || true
+printf '\n'
+
+if (( RC == 0 )); then
+  ok "finished in $((ELAPSED/60))m $((ELAPSED%60))s — log: $LOG_FILE"
+else
+  warn "rclone exited $RC after $((ELAPSED/60))m $((ELAPSED%60))s"
+  warn "last errors from $LOG_FILE:"
+  grep -i "ERROR" "$LOG_FILE" | tail -10 >&2 || true
+fi
+
+# Keep the log directory from growing without bound. An INFO-level log runs to
+# tens of MB after a big transfer and gzips about 15x, so compress every log
+# that is no longer being written before applying the retention count.
+find "$LOG_DIR" -maxdepth 1 -name '*.log' ! -name "${LOG_FILE##*/}" \
+  -exec gzip -9 {} + || true
+
+find "$LOG_DIR" -maxdepth 1 \( -name '*.log' -o -name '*.log.gz' \) -printf '%T@ %p\n' \
+  | sort -rn | tail -n "+$((KEEP_LOGS+1))" | cut -d' ' -f2- \
+  | xargs -r rm -f
+
+exit "$RC"
