@@ -5,5 +5,8 @@
     "command": "bash ~/.claude/statusline-command.sh"
   },
   "effortLevel": "xhigh",
-  "tui": "fullscreen"
+  "tui": "fullscreen",
+  "enabledPlugins": {
+    "mattpocock-skills@claude-plugins-official": true
+  }
 }
