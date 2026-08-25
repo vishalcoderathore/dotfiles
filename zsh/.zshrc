@@ -106,10 +106,52 @@ eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/jandedobbeleer.omp.jso
 export EDITOR='nvim'
 export VISUAL='nvim'
 
-# Set up fzf key bindings and fuzzy completion
-#source <(fzf --zsh)
-# Add fzf keybindings and completion for Zsh
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+# ---------------------------------------------------------------------------
+# fzf
+# ---------------------------------------------------------------------------
+
+# Source list: fd is faster than find, honours .gitignore, and still shows dotfiles.
+if command -v fd >/dev/null 2>&1; then
+  export FZF_DEFAULT_COMMAND='fd --type=f --hidden --follow --exclude .git'
+  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+  export FZF_ALT_C_COMMAND='fd --type=d --hidden --follow --exclude .git'
+fi
+
+# --height keeps fzf inline, so the prompt and scrollback above it survive
+# instead of being wiped by the alternate screen. --layout=reverse then draws
+# the prompt at the top of that box, putting the best match on the first row.
+export FZF_DEFAULT_OPTS="
+  --height=60%
+  --layout=reverse
+  --border=rounded
+  --info=inline
+  --scrollbar
+  --pointer=▶
+  --marker=✚
+  --preview='$HOME/.config/fzf/preview.sh {}'
+  --preview-window=right,55%,border-left,nowrap
+  --bind=ctrl-/:toggle-preview
+  --bind=alt-w:toggle-preview-wrap
+  --bind=alt-u:preview-half-page-up
+  --bind=alt-d:preview-half-page-down
+"
+
+# Ctrl-R lists shell history, not files, so swap the file preview for a wrapped
+# view of the command itself ({2..} drops fzf's leading history index).
+export FZF_CTRL_R_OPTS="
+  --preview='echo {2..}'
+  --preview-window=down,4,wrap,border-top
+  --bind='ctrl-y:execute-silent(printf %s {2..} | wl-copy)+abort'
+  --header='ctrl-y: copy command to clipboard'
+"
+
+# Ctrl-T insert file path | Ctrl-R search history | Alt-C cd into a subdirectory
+for _fzf_init in /usr/share/doc/fzf/examples/key-bindings.zsh \
+                 /usr/share/doc/fzf/examples/completion.zsh \
+                 ~/.fzf.zsh; do
+  [ -f "$_fzf_init" ] && source "$_fzf_init"
+done
+unset _fzf_init
 
 # Compilation flags
 # export ARCHFLAGS="-arch $(uname -m)"
@@ -170,10 +212,32 @@ alias ic="$HOME/.ssh/instanceTunnel.sh"
 alias vi="nvim"
 alias clr="clear"
 alias bat="batcat"
-alias vis='nvim $(fzf --preview="batcat --color=always {}")'
+alias vis="v"   # previous name, kept for muscle memory
 alias ldo="lazydocker"
 alias cld="claude"
 alias update-joplin='wget -O - https://raw.githubusercontent.com/laurent22/joplin/dev/Joplin_install_and_update.sh | bash'
+
+# v -- fuzzy-find a file and open it in $EDITOR.
+#   v         search from the current directory
+#   v src     search inside src/ when it is a directory, else seed the query
+#   Tab marks several files and they all open at once.
+v() {
+	local dir=. query=
+	if [[ -n $1 ]]; then
+		if [[ -d $1 ]]; then dir=$1; else query=$*; fi
+	fi
+
+	local out
+	out=$(fd --type=f --hidden --follow --exclude .git . "$dir" 2>/dev/null |
+		fzf --multi --query="$query" \
+			--prompt='⁙ ' \
+			--header='tab mark · ctrl-/ preview · alt-w wrap' \
+			--bind='ctrl-a:select-all,ctrl-x:deselect-all') || return
+	[[ -n $out ]] || return
+
+	local -a files=("${(@f)out}")
+	${EDITOR:-nvim} -- "${files[@]}"
+}
 
 # Yazi Setup
 function y() {
