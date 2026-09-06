@@ -239,6 +239,78 @@ v() {
 	${EDITOR:-nvim} -- "${files[@]}"
 }
 
+export OBSIDIAN_VAULT="$HOME/Documents/Obsidian Vault"
+
+# on -- fuzzy-find a note in the Obsidian vault and open it in $EDITOR.
+#   on            browse every note by title
+#   on idempot    seed the query
+#   alt-f         switch to full-text search; ripgrep re-runs on each keystroke
+#   alt-n         switch back to titles
+#   alt-o         open the highlighted note in the Obsidian app instead
+#   Tab marks several notes and they all open at once.
+#
+# Two modes rather than one because they answer different questions: titles for
+# "where did I put that", full text for "I know I wrote this phrase somewhere".
+# The query carries across the switch, so a title search that comes up empty is
+# one keystroke away from being retried against the bodies.
+on() {
+	local vault=$OBSIDIAN_VAULT
+	[[ -d $vault ]] || { print -u2 "on: no vault at $vault"; return 1 }
+
+	local helper=$HOME/.config/fzf/obsidian-note.sh
+
+	# Titles come from fd, bodies from rg, both printing vault-relative paths so
+	# the helper and the editor step below can treat the two modes alike.
+	local titles='fd --type=f --extension=md'
+	# Guard the empty query: `rg -- ""` matches every line of every note, which
+	# is a wall of text, not a search. Excalidraw notes are markdown wrapped
+	# round a drawing blob -- findable by title, but grepping them spews base64,
+	# so they sit out the text mode; drop the -g to let them back in.
+	local bodies='[ -n {q} ] && rg --column --line-number --no-heading --color=always --smart-case -g "!*.excalidraw.md" -- {q} || true'
+
+	local out
+	out=$(cd "$vault" && FZF_DEFAULT_COMMAND=$titles fzf \
+		--ansi --multi --query="$*" \
+		--height=80% \
+		--prompt='◈ title ' \
+		--header='alt-f full text · alt-n titles · alt-o obsidian · tab mark' \
+		--preview="$helper preview {}" \
+		--preview-window='right,60%,border-left,wrap' \
+		--bind="start:unbind(change)" \
+		--bind="alt-f:change-prompt(◈ text )+disable-search+reload($bodies)+rebind(change)" \
+		--bind="change:reload:sleep 0.1; $bodies" \
+		--bind="alt-n:unbind(change)+change-prompt(◈ title )+enable-search+reload($titles)" \
+		--bind="alt-o:execute-silent($helper open {})+abort" \
+		--bind='ctrl-a:select-all,ctrl-x:deselect-all') || return
+	[[ -n $out ]] || return
+
+	# fzf hands back the line as it read it, escape codes and all, and in text
+	# mode that line is path:line:column:match -- so strip, then split.
+	out=$(printf '%s\n' "$out" | sed $'s/\E\\[[0-9;]*m//g')
+
+	local -a files=()
+	local entry file jump=
+	for entry in "${(@f)out}"; do
+		if [[ $entry =~ '^(.+\.md):([0-9]+):' ]] && [[ -f $vault/$match[1] ]]; then
+			file=$match[1]
+			[[ -n $jump ]] || jump=$match[2]
+		else
+			file=$entry
+		fi
+		files+=("$vault/$file")
+	done
+	[[ ${#files} -gt 0 ]] || return
+
+	# +N lands on the matched line, but only the first file gets a cursor
+	# position; the rest open as a normal buffer list.
+	if [[ -n $jump ]]; then
+		${EDITOR:-nvim} "+$jump" -- "${files[@]}"
+	else
+		${EDITOR:-nvim} -- "${files[@]}"
+	fi
+}
+
+
 # Yazi Setup
 function y() {
 	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
