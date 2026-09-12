@@ -62,4 +62,18 @@ return {
     "iamcco/markdown-preview.nvim",
     enabled = false,
   },
+
+  -- LazyVim's markdown extra sets `heading.icons = {}`. render-markdown uses
+  -- the icon as the *replacement* for the '#' markers (position = 'overlay'),
+  -- so with no icon it takes an early return, never creates the overlay mark,
+  -- and the raw '## ' stays on screen while reading. Restoring the plugin's
+  -- own default icons brings back the glyphs and the concealing together.
+  {
+    "MeanderingProgrammer/render-markdown.nvim",
+    opts = {
+      heading = {
+        icons = { "󰲡 ", "󰲣 ", "󰲥 ", "󰲧 ", "󰲩 ", "󰲫 " },
+      },
+    },
+  },
 }
