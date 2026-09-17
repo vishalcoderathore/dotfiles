@@ -99,6 +99,24 @@ You'll know it worked when the Catppuccin status bar appears at the top of the s
 
 **Always name your sessions.** `tmux attach -t api` is something you can remember a day later; `tmux attach -t 0` is not.
 
+### Shell shortcuts
+
+`~/dotfiles/zsh/.zshrc` enables oh-my-zsh's `tmux` plugin, which wraps the commands above into shorter aliases:
+
+| Alias | Equivalent |
+|---|---|
+| `to <name>` | new-or-attach — creates `<name>` if it doesn't exist yet, attaches if it does |
+| `ta <name>` | `tmux attach -t <name>` |
+| `tad <name>` | attach, detaching any other client on that session |
+| `ts <name>` | `tmux new -s <name>` |
+| `tkss <name>` | `tmux kill-session -t <name>` |
+| `tksv` | kill the whole tmux server |
+| `tl` | `tmux ls` |
+| `tds` | new-or-attach a session named after the current directory |
+| `tmuxconf` | open this config in `$EDITOR` |
+
+**`to <name>` is the one to reach for day to day** — it collapses the new-vs-attach decision into one command, so `to api` replaces both `tmux new -s api` and `tmux attach -t api` depending on whether `api` already exists. These are shell aliases, not tmux bindings, so they only exist where this machine's zsh dotfiles are installed — a bare `ssh` into a box without them still needs the full `tmux` commands (see [Workflows](#11-workflows)).
+
 ---
 
 ## 5. Panes
@@ -164,10 +182,10 @@ A session is the outermost container, and the reason tmux matters.
 | Action | Keys / Command |
 |---|---|
 | Detach (leave it running) | `prefix + d` |
-| Reattach | `tmux attach -t dev` |
+| Reattach | `tmux attach -t dev` (or `ta dev`) |
 | Switch between sessions | `prefix + s` |
 | Rename session | `prefix + $` |
-| List sessions | `tmux ls` |
+| List sessions | `tmux ls` (or `tl`) |
 
 **Detaching is not quitting.** `prefix + d` returns you to your normal shell while everything in the session keeps running — servers stay up, builds keep going. Close the terminal entirely and the session still survives. Reattach whenever, and it's exactly as you left it.
 
@@ -265,7 +283,7 @@ Continuum handles this automatically, so you rarely need the manual keys. Pane c
 ### Starting a project
 
 ```bash
-tmux new -s api           # name it after the project
+to api                    # name it after the project (new-or-attach)
 # prefix + |              → split: editor left, shell right
 # Ctrl+l                  → move to the right pane
 npm run dev               # start the server there
@@ -278,7 +296,7 @@ nvim .                    # edit, with the server still visible
 Later:
 
 ```bash
-tmux attach -t api        # exactly as you left it
+to api                     # exactly as you left it
 ```
 
 ### Focusing on one thing
@@ -293,6 +311,8 @@ tmux new -s deploy        # or: tmux attach -t deploy
 ```
 
 Start tmux *first thing* after connecting, before you run anything long. That way a dropped connection costs nothing.
+
+**Use the full `tmux` commands here, not the aliases.** `to`, `ta`, `tl` and friends come from this machine's zsh dotfiles — a remote box only has them if you've stowed the same dotfiles there too.
 
 ---
 
@@ -354,9 +374,17 @@ gg / G      top / bottom        ───────
                                 prefix r    reload config
                                 prefix :    command prompt
                                 prefix ?    list every binding
+
+SHELL ALIASES (oh-my-zsh tmux plugin — local shell only, not tmux bindings)
+────────────────────────────────────────────────────────────────────────
+to <name>    new-or-attach         tl            list sessions
+ta <name>    attach                tkss <name>   kill session
+tad <name>   attach, detach others tksv          kill server
+ts <name>    new session           tds           session named for cwd
+                                   tmuxconf      edit this config
 ```
 
-**`prefix + ?` lists every active binding** — the authoritative answer when this guide and the config disagree.
+**`prefix + ?` lists every active binding** — the authoritative answer when this guide and the config disagree. It won't show the shell aliases above, since those live in `~/dotfiles/zsh/.zshrc`, not the tmux config.
 
 ---
 

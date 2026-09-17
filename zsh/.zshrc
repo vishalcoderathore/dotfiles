@@ -77,7 +77,7 @@ export ZSH="$HOME/.oh-my-zsh"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git zsh-autosuggestions fast-syntax-highlighting)
+plugins=(git zsh-autosuggestions fast-syntax-highlighting tmux)
 
 # Ensure ~/.local/bin is in the PATH
 export PATH=$HOME/.local/bin:$PATH
