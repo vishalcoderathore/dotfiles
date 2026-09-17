@@ -52,9 +52,12 @@ extract = [
 	{ run = "ya pub extract --list %s", desc = "Extract here" },
 ]
 play = [
-	{ run = "mpv --force-window %s", for = "unix", orphan = true },
-	{ run = "mpv --force-window %s", for = "windows", orphan = true },
+	{ run = "xdg-open %s1",    desc = "Play", for = "linux", orphan = true },
+	{ run = "open %s",         desc = "Play", for = "macos" },
+	{ run = 'start "" %s1',    desc = "Play", for = "windows", orphan = true },
+	{ run = "termux-open %s1", desc = "Play", for = "android" },
 	{ run = "mediainfo %s1; echo 'Press enter to exit'; read _", block = true, desc = "Show media info", for = "unix" },
+	{ run = "mediainfo %s1 & pause", block = true, desc = "Show media info", for = "windows" },
 ]
 download = [
 	{ run = "ya emit download --open %S", desc = "Download and open" },
