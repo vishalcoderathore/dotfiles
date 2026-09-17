@@ -1,2 +1,7 @@
 [flavor]
 dark = "catppuccin-mocha"
+
+# Match the hovered-file capsule to the mode badge's style (bluish bg, dark text).
+# The rounded caps come from `[indicator].padding` (default, unset here).
+[indicator]
+current = { fg = "#1e1e2e", bg = "#89b4fa", bold = true }
