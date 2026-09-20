@@ -11,6 +11,9 @@ fi
 # Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
+# Adding Homebrew (must precede oh-my-zsh so plugins like tmux can find brew binaries)
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time Oh My Zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
@@ -329,9 +332,6 @@ export TERM=xterm-256color
 
 # Adding typescript language server to PATH
 export PATH="$PATH:$(npm bin -g)"
-
-# Adding Homebrew
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 export PATH="$PATH:$HOME/.rvm/bin"
