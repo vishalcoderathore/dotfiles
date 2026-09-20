@@ -16,6 +16,12 @@ vim.g.lazyvim_prettier_needs_config = false
 -- ("ruff") are deliberately not set here -- they already match the current
 -- upstream defaults of the lang.python extra.
 
+-- Project root detection (<leader>e, <leader>ff, <leader>/, ...). Upstream
+-- default is { "lsp", { ".git", "lua" }, "cwd" }, which lets a nested project
+-- marker (e.g. services/api/pyproject.toml picked up by pyright/ruff) win over
+-- the repo root. Try the git root first, then fall back to LSP, then cwd.
+vim.g.root_spec = { { ".git", "lua" }, "lsp", "cwd" }
+
 -- Line numbers: absolute plus relative.
 vim.opt.number = true
 vim.opt.relativenumber = true
