@@ -15,6 +15,7 @@ action=${1:-preview}
 line=${2:-}
 [ -n "$line" ] || exit 0
 
+here=${BASH_SOURCE[0]%/*}
 vault=${OBSIDIAN_VAULT:-$HOME/Documents/Obsidian Vault}
 cd "$vault" 2>/dev/null || exit 0
 
@@ -66,9 +67,13 @@ fi
 
 # Title mode is for reading, so render the markdown rather than showing source.
 # The head cap keeps an Excalidraw note (markdown wrapped round a drawing blob)
-# from stalling the pane.
-if command -v glow >/dev/null 2>&1; then
-    head -n 400 -- "$file" | glow --style=dark --width="${FZF_PREVIEW_COLUMNS:-80}" -
+# from stalling the pane. fzf pipes the preview's stdout, which caps glow at 16
+# colours even with CLICOLOR_FORCE, so rich (truecolor, like bat in `v`) goes
+# first and glow is the fallback for a machine without it.
+if python3 -c 'import rich' >/dev/null 2>&1; then
+    head -n 400 -- "$file" | python3 "$here/render-md.py" "${FZF_PREVIEW_COLUMNS:-80}"
+elif command -v glow >/dev/null 2>&1; then
+    head -n 400 -- "$file" | CLICOLOR_FORCE=1 glow --style=dark --width="${FZF_PREVIEW_COLUMNS:-80}" -
 elif [ -n "$BAT" ]; then
     "$BAT" --color=always --style=numbers --language=md --line-range=:400 -- "$file"
 else
