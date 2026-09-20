@@ -142,15 +142,26 @@ The symbol matches the divider you get: `|` gives a vertical line, `-` a horizon
 
 **`Ctrl+h/j/k/l` needs no prefix.** It also crosses into Neovim splits — tmux detects that a pane is running Neovim and hands the key over instead of switching panes. So the same four keys move you around your whole screen, editor splits included, with no mental gear change at the border. That's the `vim-tmux-navigator` plugin, and it requires its Neovim counterpart (`nvim/.config/nvim/lua/plugins/tmux-navigator.lua`) to work in both directions.
 
+### Telling which pane is active
+
+Two cues, both in the Catppuccin palette:
+
+- **The border.** The active pane's border is **green** and drawn as a heavy line. Inactive borders stay grey. In copy mode the active border turns lavender, and mauve when panes are synchronized.
+- **The label on each pane's bottom edge.** Every pane shows its number and current folder. The active pane's label is a green pill; the others are grey. The number is the same one `prefix + q` flashes over each pane.
+
 ### Managing
 
 | Action | Keys |
 |---|---|
 | Zoom pane to fullscreen (toggle) | `prefix + z` |
-| Resize left / down / up / right | `prefix + H/J/K/L` |
+| Resize, 5 cells at a time | `prefix + Alt+arrow` |
+| Resize, 1 cell at a time | `prefix + Ctrl+arrow` |
+| Resize with the mouse | Drag a pane border |
 | Close pane | `prefix + x` then `y`, or just `exit` |
 | Convert pane into its own window | `prefix + !` |
 | Cycle through layouts | `prefix + Space` |
+
+Both keyboard resizes repeat: press the prefix once, then keep tapping the arrow, as long as each tap lands within half a second of the last.
 
 **`prefix + z` is the one you'll use constantly.** Split to keep context visible, zoom when you need to focus, unzoom when you're done. The `[Z]` in the status bar tells you a pane is zoomed — worth knowing, because a zoomed pane looks exactly like a window with no splits.
 
@@ -229,12 +240,15 @@ The bar sits at the **top** and is transparent, inheriting your terminal backgro
 | Position | Shows | Example |
 |---|---|---|
 | Left | Session name | `dev` |
-| Left | Window count | `1 windows` |
 | Middle | Window list — current one highlighted | `zsh in dotfiles` |
 | Right | `[Z]` when a pane is zoomed | `[Z]` |
 | Right | Machine's IP address | `192.168.178.48` |
-| Right | Date and time | `Sat 12 Sep 14:19` |
+| Right | Date and time | `Sep 19, 5:52PM` |
 | Right | Hostname | `pop-os` |
+
+The session name turns red while the prefix is armed — a quick way to see that tmux is waiting for your next key.
+
+The bar describes the window as a whole. Each pane's border colour and bottom label are covered in [Telling which pane is active](#telling-which-pane-is-active).
 
 Two things that commonly confuse people here:
 
@@ -263,7 +277,7 @@ Managed by **TPM**, installed to `~/.tmux/plugins/`.
 | **vim-tmux-navigator** | `Ctrl+h/j/k/l` across tmux panes and Neovim splits |
 | **catppuccin/tmux** | The Mocha theme on the status bar |
 | **tmux-resurrect** | Save and restore sessions by hand |
-| **tmux-continuum** | Autosaves every 10 minutes, restores on start |
+| **tmux-continuum** | Autosaves every 10 minutes. Auto-restore is **off** — restore by hand |
 
 ### Saving and restoring sessions
 
@@ -272,7 +286,7 @@ Managed by **TPM**, installed to `~/.tmux/plugins/`.
 | Save now | `prefix + Ctrl+s` (i.e. `Ctrl+s Ctrl+s`) |
 | Restore last save | `prefix + Ctrl+r` |
 
-Continuum handles this automatically, so you rarely need the manual keys. Pane contents are captured too, not just the layout.
+Continuum saves automatically, so you rarely need the manual save. **Restoring is manual**: starting tmux never brings old sessions back on its own, so after a reboot press `prefix + Ctrl+r`. Auto-restore is off because a restore finishes by switching to the last saved session, which pulls a fresh `ts <name>` client out of the session it just created. Pane contents are captured too, not just the layout.
 
 > The config pins `TMUX_PLUGIN_MANAGER_PATH` to `~/.tmux/plugins/` on purpose. Left at its default, TPM installs to `~/.config/tmux/plugins/` — which stow symlinks back into this repo, dumping megabytes of plugin checkouts into version control.
 
@@ -320,10 +334,11 @@ Start tmux *first thing* after connecting, before you run anything long. That wa
 
 | What you see | What's happening |
 |---|---|
-| "tmux-resurrect file not found" on startup | Nothing has been saved yet. Press `Ctrl+s Ctrl+s` once, or wait 10 minutes for the autosave. It stops after that. |
+| "Tmux resurrect file not found!" after `prefix + Ctrl+r` | Nothing has been saved yet. Press `Ctrl+s Ctrl+s` once, or wait 10 minutes for the autosave, then restore again. |
 | Shortcuts do nothing | You're holding `Ctrl` for the second key. Tap `Ctrl+s`, **release**, then press the key. |
 | Scroll wheel acts strangely | You're in copy mode. Press `q`. |
 | Config changes have no effect | Reload with `prefix + r`. Some options need a fully new session. |
+| A binding you deleted still works | Reloading adds and changes settings but never removes ones that are already loaded. Run `tmux unbind -T prefix <key>`, or restart the tmux server. |
 | Split looks like it vanished | You may be zoomed. Look for `[Z]` on the right, press `prefix + z`. |
 | `Ctrl+h/j/k/l` stops at Neovim's edge | The Neovim half of `vim-tmux-navigator` is missing or didn't load. |
 | Colours look flat or wrong | The terminal isn't advertising truecolor. This config sets `tmux-256color` with an RGB override. |
@@ -350,7 +365,7 @@ prefix |    split vertical      prefix c    new window
 prefix -    split horizontal    prefix n    next
 prefix z    zoom toggle         prefix p    previous
 prefix x    close               prefix 1-9  jump to number
-prefix H/J/K/L  resize          prefix w    list windows
+prefix Alt+arrow  resize        prefix w    list windows
 prefix q    show numbers        prefix ,    rename
 prefix !    pane → window       prefix &    close window
 
