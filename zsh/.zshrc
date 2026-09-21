@@ -331,7 +331,7 @@ export PATH="$HOME/.cargo/bin:$PATH"
 export TERM=xterm-256color
 
 # Adding typescript language server to PATH
-export PATH="$PATH:$(npm bin -g)"
+export PATH="$PATH:$(npm prefix -g)/bin"
 
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 export PATH="$PATH:$HOME/.rvm/bin"
