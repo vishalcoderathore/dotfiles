@@ -1,4 +1,4 @@
-local wezterm = require 'wezterm'
+local wezterm = require("wezterm")
 local config = wezterm.config_builder()
 
 --config.enable_wayland = true
@@ -14,6 +14,5 @@ require("keys")(config)
 
 -- Works with macOS only
 --config.macos_window_background_blur = 20
-
 
 return config
