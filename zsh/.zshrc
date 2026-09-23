@@ -191,6 +191,20 @@ eval "$(rbenv init -)"
 # Add zoxide
 eval "$(zoxide init zsh)"
 
+# sc -- fuzzy-jump to a tmux session via sesh (running sessions, zoxide
+# dirs, sesh.toml configs), same picker as the tmux prefix+s binding but
+# usable from a bare shell before tmux even exists.
+sc() {
+	local session
+	session=$(sesh list --icons --hide-duplicates |
+		fzf --no-sort --ansi \
+			--prompt='⚡ ' \
+			--header='enter: connect' \
+			--preview='sesh preview {}') || return
+	[[ -n $session ]] || return
+	sesh connect "$session"
+}
+
 # Setup default Node Version
 function change_node_version {
 	nvmrc="./.nvmrc"
