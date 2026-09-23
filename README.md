@@ -185,7 +185,7 @@ Firefox Developer Edition is not available in most package managers or app store
 Shell configuration managed via [Oh My Zsh](https://ohmyzsh.com) with the following setup:
 - **Prompt**: Oh My Posh (`multiverse-neon` theme)
 - **Plugins**: `git`, `zsh-autosuggestions`, `fast-syntax-highlighting`
-- **Tools integrated**: NVM, rbenv, RVM, fzf, Homebrew, .NET SDK, Rust (cargo)
+- **Tools integrated**: NVM, rbenv, RVM, fzf, zoxide, Homebrew, .NET SDK, Rust (cargo)
 - **Notable aliases**: `vi` → nvim, `ls` → lsd, `bat` → batcat, `ldo` → lazydocker, `y` → yazi (with cwd-tracking)
 
 #### Link Zsh Config

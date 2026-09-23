@@ -188,6 +188,9 @@ export PATH="$HOME/.dotnet:$HOME/.dotnet/tools:$PATH"
 export PATH="$HOME/.rbenv/bin:$PATH"
 eval "$(rbenv init -)"
 
+# Add zoxide
+eval "$(zoxide init zsh)"
+
 # Setup default Node Version
 function change_node_version {
 	nvmrc="./.nvmrc"
