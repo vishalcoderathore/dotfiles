@@ -213,7 +213,7 @@ function change_node_version {
 		nvm use $version
 	fi
 }
-chpwd_functions=(change_node_version)
+chpwd_functions+=(change_node_version)
 
 # Custom Aliases
 alias upd="sudo nala update"
