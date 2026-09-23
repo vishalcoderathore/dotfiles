@@ -191,6 +191,17 @@ eval "$(rbenv init -)"
 # Add zoxide
 eval "$(zoxide init zsh)"
 
+# zi preview: lsd with icons, one entry per line, folders first. This replaces
+# zoxide's default fzf options wholesale, so its defaults are repeated
+# here; {2..} is the path with the score column dropped.
+export _ZO_FZF_OPTS="
+  --height=80% --layout=reverse --border=sharp --info=inline
+  --cycle --keep-right --tabstop=1 --exit-0 --select-1
+  --bind=ctrl-z:ignore,btab:up,tab:down
+  --preview='lsd -1 --group-dirs first --color=always --icon=always {2..}'
+  --preview-window=right,50%
+"
+
 # sc -- fuzzy-jump to a tmux session via sesh (running sessions, zoxide
 # dirs, sesh.toml configs), same picker as the tmux prefix+s binding but
 # usable from a bare shell before tmux even exists.
