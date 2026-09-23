@@ -10,16 +10,27 @@ This repository contains my dotfiles and configuration management using `stow`. 
 
 I use **Homebrew** as my package manager for installing CLI tools. Below is a list of packages currently installed on my system:
 
-- **lazydocker** → Installed via:
-  ```sh
-  brew install lazydocker
-- **yarn** → Installed via:
-  ```sh
-  brew install yarn
-- **yazi** → Installed via:
-  ```sh
-  brew install yazi
-  
+| Package | Used by | Install Command |
+|---|---|---|
+| lazydocker | `ldo` alias | `brew install lazydocker` |
+| yarn | JS projects | `brew install yarn` |
+| yazi | `y` function | `brew install yazi` |
+| tmux | terminal multiplexer | `brew install tmux` |
+| zoxide | `z` jumps, sesh's folder list | `brew install zoxide` |
+| sesh | `sc` / tmux `prefix + s` session picker | `brew install sesh` |
+| fd | `v` / `on` file pickers, yazi | `brew install fd` |
+| wl-clipboard | fzf `ctrl-y` copy (`wl-copy`) | `brew install wl-clipboard` |
+
+`.zshrc` runs `zoxide init` unconditionally, so a new shell errors with `command not found: zoxide` until zoxide is installed.
+
+### Apt
+| Package | Used by | Install Command |
+|---|---|---|
+| fzf | every fuzzy picker; also ships `fzf-tmux` and the Ctrl-T/Ctrl-R/Alt-C key bindings `.zshrc` sources | `sudo apt install fzf` |
+| ripgrep | `on` full-text mode, Neovim | `sudo apt install ripgrep` |
+| bat | `cat` / `bat` aliases (`batcat`) | `sudo apt install bat` |
+| stow | linking these dotfiles | `sudo apt install stow` |
+
 ### Wezterm
 Wezterm (terminal emulator) → Installed via Cosmic Store
 #### Install flathub
@@ -79,6 +90,7 @@ Config is [LazyVim](https://lazyvim.org) on top of
 nvim/.config/nvim/
 ├── lazyvim.json            # which LazyVim extras are enabled
 ├── lsp/easy_dotnet.lua     # Roslyn inlay hints + Neovim file watching
+├── lsp/pyright.lua         # point pyright at <root>/.venv/bin/python when present
 ├── after/ftplugin/cs.lua   # C#: 4-space indent, no format-on-save
 └── lua/
     ├── config/             # options, keymaps, lazy bootstrap
@@ -134,12 +146,13 @@ I use GNU Stow to manage my configuration files in a structured way.
 I then use stow to create symlinks for specific applications:
 ```
 stow lazydocker
-stow yarn
 stow yazi
 stow kitty
 stow wezterm
 stow nvim
 stow zsh
+stow tmux
+stow claude
 ```
 This automatically symlinks the configurations from `~/dotfiles/` into the corresponding locations inside `~/.config/` (and `~` for dotfiles like `.zshrc`).
 
@@ -183,16 +196,59 @@ Firefox Developer Edition is not available in most package managers or app store
 
 ## 🐚 Zsh
 Shell configuration managed via [Oh My Zsh](https://ohmyzsh.com) with the following setup:
-- **Prompt**: Oh My Posh (`multiverse-neon` theme)
-- **Plugins**: `git`, `zsh-autosuggestions`, `fast-syntax-highlighting`
+- **Prompt**: Oh My Posh (`jandedobbeleer` theme; `catppuccin_mocha`, `larserikfinholt` and `multiverse-neon` are also tracked)
+- **Plugins**: `git`, `zsh-autosuggestions`, `fast-syntax-highlighting`, `tmux`
 - **Tools integrated**: NVM, rbenv, RVM, fzf, zoxide, Homebrew, .NET SDK, Rust (cargo)
-- **Notable aliases**: `vi` → nvim, `ls` → lsd, `bat` → batcat, `ldo` → lazydocker, `y` → yazi (with cwd-tracking)
+- **Notable aliases**: `vi` → nvim, `ls` → lsd, `cat`/`bat` → batcat, `ldo` → lazydocker, `cld` → claude
+- **Functions**:
+  - `v` — fuzzy-find files (fd + fzf) and open them in `$EDITOR`
+  - `on` — fuzzy-find Obsidian notes by title, or full text with `alt-f`
+  - `sc` — sesh session picker (see [tmux](#-tmux))
+  - `y` — yazi with cwd-tracking
+
+`zsh-autosuggestions` and `fast-syntax-highlighting` are not bundled with Oh My Zsh:
+```bash
+git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+git clone https://github.com/zdharma-continuum/fast-syntax-highlighting ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/fast-syntax-highlighting
+```
 
 #### Link Zsh Config
 ```bash
 cd ~/dotfiles
 stow zsh
 ```
+Besides `~/.zshrc`, this links the Oh My Posh themes (`~/.config/oh-my-posh/`) and the fzf helper scripts `on` uses (`~/.config/fzf/`).
+
+---
+
+## 🪟 tmux
+tmux → Installed via Homebrew (see above). Prefix is **`Ctrl+s`**.
+[`tmux/TMUX_GUIDE.md`](tmux/TMUX_GUIDE.md) is the full guide to this config.
+
+#### Link tmux Config and Install Plugins
+```bash
+cd ~/dotfiles
+stow tmux
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+```
+Then start tmux and press `prefix + I` to install the plugins: tmux-sensible, vim-tmux-navigator,
+Catppuccin (Mocha), tmux-resurrect and tmux-continuum. Plugins live in `~/.tmux/plugins/`,
+outside the repo.
+
+#### Sessions with sesh + zoxide
+[sesh](https://github.com/joshmedeski/sesh) lists running tmux sessions alongside directories
+from zoxide's history, in one fzf picker:
+- `sc` — from a plain shell, before tmux is running
+- `prefix + s` — the same picker as a popup inside tmux
+
+Picking a running session (grid icon) attaches to it; picking a folder (folder icon) creates a
+session there, named after the folder. Needs `sesh`, `zoxide` and `fzf` installed.
+
+#### Saving and Restoring (resurrect + continuum)
+- `prefix + Ctrl-s` saves every session; continuum also saves every 10 minutes
+- `prefix + Ctrl-r` restores the most recent save (auto-restore is off)
+
+Snapshots live in `~/.local/share/tmux/resurrect/`.
 
 ---
 
