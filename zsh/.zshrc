@@ -215,6 +215,7 @@ alias ic="$HOME/.ssh/instanceTunnel.sh"
 alias vi="nvim"
 alias clr="clear"
 alias bat="batcat"
+alias cat="batcat"
 alias vis="v"   # previous name, kept for muscle memory
 alias ldo="lazydocker"
 alias cld="claude"
