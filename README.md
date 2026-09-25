@@ -20,6 +20,7 @@ I use **Homebrew** as my package manager for installing CLI tools. Below is a li
 | sesh | `sc` / tmux `prefix + s` session picker | `brew install sesh` |
 | fd | `v` / `on` file pickers, yazi | `brew install fd` |
 | wl-clipboard | fzf `ctrl-y` copy (`wl-copy`) | `brew install wl-clipboard` |
+| starship | zsh prompt (`~/.config/starship.toml`) | `brew install starship` |
 
 `.zshrc` runs `zoxide init` unconditionally, so a new shell errors with `command not found: zoxide` until zoxide is installed.
 
@@ -196,7 +197,7 @@ Firefox Developer Edition is not available in most package managers or app store
 
 ## 🐚 Zsh
 Shell configuration managed via [Oh My Zsh](https://ohmyzsh.com) with the following setup:
-- **Prompt**: Oh My Posh (`jandedobbeleer` theme; `catppuccin_mocha`, `larserikfinholt` and `multiverse-neon` are also tracked)
+- **Prompt**: [Starship](https://starship.rs) (`~/.config/starship.toml`): minimal two-line prompt, Catppuccin Mocha colours, git branch/status on the left, project language icon + version and AWS profile on the right
 - **Plugins**: `git`, `zsh-autosuggestions`, `fast-syntax-highlighting`, `tmux`
 - **Tools integrated**: NVM, rbenv, RVM, fzf, zoxide, Homebrew, .NET SDK, Rust (cargo)
 - **Notable aliases**: `vi` → nvim, `ls` → lsd, `cat`/`bat` → batcat, `ldo` → lazydocker, `cld` → claude
@@ -217,7 +218,7 @@ git clone https://github.com/zdharma-continuum/fast-syntax-highlighting ${ZSH_CU
 cd ~/dotfiles
 stow zsh
 ```
-Besides `~/.zshrc`, this links the Oh My Posh themes (`~/.config/oh-my-posh/`) and the fzf helper scripts `on` uses (`~/.config/fzf/`).
+Besides `~/.zshrc`, this links the Starship prompt config (`~/.config/starship.toml`) and the fzf helper scripts `on` uses (`~/.config/fzf/`).
 
 ---
 
