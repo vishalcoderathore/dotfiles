@@ -146,7 +146,7 @@ The symbol matches the divider you get: `|` gives a vertical line, `-` a horizon
 
 Two cues, both in the Catppuccin palette:
 
-- **The border.** The active pane's border is **green** and drawn as a heavy line. Inactive borders stay grey. In copy mode the active border turns lavender, and mauve when panes are synchronized.
+- **The border.** Heavy lines that touch the active pane are **green**; the rest stay grey. In a two-pane window the single divider is therefore green whichever pane is active, so look at each pane's bottom edge: green under the active pane, grey under the other. In copy mode the green turns lavender, and mauve when panes are synchronized.
 - **The label on each pane's bottom edge.** Every pane shows its number and current folder. The active pane's label is a green pill; the others are grey. The number is the same one `prefix + q` flashes over each pane.
 
 ### Managing
