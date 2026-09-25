@@ -1,5 +1,8 @@
 [flavor]
 dark = "catppuccin-mocha"
+# Same flavor for light: tmux popups don't answer the background-color query,
+# so yazi falls back to light there
+light = "catppuccin-mocha"
 
 # Match the hovered-file capsule to the mode badge's style (bluish bg, dark text).
 # The rounded caps come from `[indicator].padding` (default, unset here).
