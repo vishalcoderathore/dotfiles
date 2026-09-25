@@ -192,7 +192,13 @@ sc() {
 		fzf --no-sort --ansi \
 			--prompt='⚡ ' \
 			--header='enter: connect' \
-			--preview='sesh preview {}') || return
+			--preview='p={2..}; p=${p/#\~/$HOME}
+				if [[ -d $p ]]; then
+					lsd -1 --group-dirs first --color=always --icon=always "$p"
+				else
+					sesh preview {}
+				fi' \
+			--preview-window=right,50%) || return
 	[[ -n $session ]] || return
 	sesh connect "$session"
 }
