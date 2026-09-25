@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Popup launcher (bound to prefix + a). First choose a mode:
-#   terminal - a plain shell in the current pane's directory
+#   terminal - a shell in the current pane's directory, inside a nested tmux
+#              session named "popup". A real tmux pane answers terminal queries
+#              (background color, emulator), which a bare popup doesn't; tools
+#              like yazi otherwise lose their colors and stall on quit.
 #   nvim     - ask an LLM harness a Neovim question; offers only the harnesses
 #              installed on this machine and starts an interactive session in
 #              this folder so it picks up AGENTS.md / CLAUDE.md.
@@ -23,7 +26,8 @@ pick() {
 
 mode=$(pick "popup" terminal nvim)
 case "$mode" in
-  terminal) exec "${SHELL:-bash}" ;;
+  # destroy-unattached: the session dies with the popup, however it's closed
+  terminal) exec env -u TMUX tmux new-session -s popup -c "$PWD" \; set destroy-unattached on ;;
   nvim) ;;
   *) exit 0 ;;
 esac
