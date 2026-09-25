@@ -73,7 +73,7 @@ export PATH=$HOME/.local/bin:$PATH
 source $ZSH/oh-my-zsh.sh
 
 # Set Starship as the prompt (config: ~/.config/starship.toml)
-eval "$(starship init zsh)"
+(( $+commands[starship] )) && eval "$(starship init zsh)"
 
 
 # User configuration
