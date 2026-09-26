@@ -30,14 +30,10 @@ return {
     dependencies = { "nvim-neotest/nvim-nio" },
   },
 
-  -- html-lsp supplies vscode-html-language-server for EasyDotnet's Razor/Blazor
-  -- bridge. Mason links it into its own bin dir, which is prepended to Neovim's
-  -- PATH, so EasyDotnet's auto-detection finds it without a global npm install.
-  -- No `html` server is enabled for ordinary .html buffers.
-  {
-    "mason-org/mason.nvim",
-    opts = { ensure_installed = { "html-lsp" } },
-  },
+  -- EasyDotnet's Razor/Blazor bridge needs vscode-html-language-server. Install
+  -- it by hand with `:MasonInstall html-lsp` (see lua/lockdown.lua): Mason
+  -- links it into its own bin dir, which is prepended to Neovim's PATH, so
+  -- EasyDotnet's auto-detection finds it without a global npm install.
 
   -- C# parser in, F# and JSON5 out. This file is imported after python.lua
   -- alphabetically, but both filters are independent so order does not matter.
