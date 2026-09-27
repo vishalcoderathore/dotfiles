@@ -1,97 +1,72 @@
-# If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
+# ---------------------------------------------------------------------------
+# PATH and environment
+# ---------------------------------------------------------------------------
 
-# Path to your Oh My Zsh installation.
-export ZSH="$HOME/.oh-my-zsh"
-
-# Adding Homebrew (must precede oh-my-zsh so plugins like tmux can find brew binaries)
+# Homebrew (must precede oh-my-zsh so plugins like tmux can find brew binaries)
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
+export PATH="$HOME/.local/bin:$PATH"
+
+export EDITOR='nvim'
+export VISUAL='nvim'
+
+export OBSIDIAN_VAULT="$HOME/Documents/Obsidian Vault"
+
+# ---------------------------------------------------------------------------
+# Oh My Zsh and prompt
+# ---------------------------------------------------------------------------
+
+export ZSH="$HOME/.oh-my-zsh"
 
 # No Oh My Zsh theme: the prompt comes from Starship (initialised below).
 ZSH_THEME=""
 
-# Uncomment the following line to use case-sensitive completion.
-# CASE_SENSITIVE="true"
-
-# Uncomment the following line to use hyphen-insensitive completion.
-# Case-sensitive completion must be off. _ and - will be interchangeable.
-# HYPHEN_INSENSITIVE="true"
-
-# Uncomment one of the following lines to change the auto-update behavior
-# zstyle ':omz:update' mode disabled  # disable automatic updates
-# zstyle ':omz:update' mode auto      # update automatically without asking
-# zstyle ':omz:update' mode reminder  # just remind me to update when it's time
-
-# Uncomment the following line to change how often to auto-update (in days).
-# zstyle ':omz:update' frequency 13
-
-# Uncomment the following line if pasting URLs and other text is messed up.
-# DISABLE_MAGIC_FUNCTIONS="true"
-
-# Uncomment the following line to disable colors in ls.
-# DISABLE_LS_COLORS="true"
-
-# Uncomment the following line to disable auto-setting terminal title.
-# DISABLE_AUTO_TITLE="true"
-
-# Uncomment the following line to enable command auto-correction.
-# ENABLE_CORRECTION="true"
-
-# Uncomment the following line to display red dots whilst waiting for completion.
-# You can also set it to another string to have that shown instead of the default red dots.
-# e.g. COMPLETION_WAITING_DOTS="%F{yellow}waiting...%f"
-# Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
-# COMPLETION_WAITING_DOTS="true"
-
-# Uncomment the following line if you want to disable marking untracked files
-# under VCS as dirty. This makes repository status check for large repositories
-# much, much faster.
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
-
-# Uncomment the following line if you want to change the command execution time
-# stamp shown in the history command output.
-# You can set one of the optional three formats:
-# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-# or set a custom format using the strftime function format specifications,
-# see 'man strftime' for details.
-# HIST_STAMPS="mm/dd/yyyy"
-
-# Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
-
-# Which plugins would you like to load?
-# Standard plugins can be found in $ZSH/plugins/
-# Custom plugins may be added to $ZSH_CUSTOM/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(git zsh-autosuggestions fast-syntax-highlighting tmux)
 
-# Ensure ~/.local/bin is in the PATH
-export PATH=$HOME/.local/bin:$PATH
-
-# Load Oh My Zsh
 source $ZSH/oh-my-zsh.sh
 
 # Set Starship as the prompt (config: ~/.config/starship.toml)
 (( $+commands[starship] )) && eval "$(starship init zsh)"
 
+# ---------------------------------------------------------------------------
+# Languages and tools
+# ---------------------------------------------------------------------------
 
-# User configuration
+# Load NVM into the current shell session
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-# export MANPATH="/usr/local/man:$MANPATH"
+# Switch to the Node version in .nvmrc when cd-ing into a project
+function change_node_version {
+	local nvmrc="./.nvmrc" version
+	if [ -f "$nvmrc" ]; then
+		version="$(cat "$nvmrc")"
+		nvm use $version
+	fi
+}
+chpwd_functions+=(change_node_version)
 
-# You may need to manually set your language environment
-# export LANG=en_US.UTF-8
+# .NET SDK and tools
+export DOTNET_ROOT="$HOME/.dotnet"
+export PATH="$HOME/.dotnet:$HOME/.dotnet/tools:$PATH"
 
-# Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='nvim'
-# fi
+# Rust
+export PATH="$HOME/.cargo/bin:$PATH"
 
-export EDITOR='nvim'
-export VISUAL='nvim'
+# zoxide
+eval "$(zoxide init zsh)"
+
+# zi preview: lsd with icons, one entry per line, folders first. This replaces
+# zoxide's default fzf options wholesale, so its defaults are repeated
+# here; {2..} is the path with the score column dropped.
+export _ZO_FZF_OPTS="
+  --height=80% --layout=reverse --border=sharp --info=inline
+  --cycle --keep-right --tabstop=1 --exit-0 --select-1
+  --bind=ctrl-z:ignore,btab:up,tab:down
+  --preview='lsd -1 --group-dirs first --color=always --icon=always {2..}'
+  --preview-window=right,50%
+"
 
 # ---------------------------------------------------------------------------
 # fzf
@@ -134,54 +109,38 @@ export FZF_CTRL_R_OPTS="
 
 # Ctrl-T insert file path | Ctrl-R search history | Alt-C cd into a subdirectory
 for _fzf_init in /usr/share/doc/fzf/examples/key-bindings.zsh \
-                 /usr/share/doc/fzf/examples/completion.zsh \
-                 ~/.fzf.zsh; do
+                 /usr/share/doc/fzf/examples/completion.zsh; do
   [ -f "$_fzf_init" ] && source "$_fzf_init"
 done
 unset _fzf_init
 
-# Compilation flags
-# export ARCHFLAGS="-arch $(uname -m)"
+# ---------------------------------------------------------------------------
+# Aliases
+# ---------------------------------------------------------------------------
 
-# Set personal aliases, overriding those provided by Oh My Zsh libs,
-# plugins, and themes. Aliases can be placed here, though Oh My Zsh
-# users are encouraged to define aliases within a top-level file in
-# the $ZSH_CUSTOM folder, with .zsh extension. Examples:
-# - $ZSH_CUSTOM/aliases.zsh
-# - $ZSH_CUSTOM/macos.zsh
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
+alias upd="sudo nala update"
+alias upg="sudo nala upgrade"
+alias autoclean="sudo apt-get autoclean"
+alias install="sudo nala install"
+alias remove="sudo nala remove --purge"
+alias -g G="| grep"
+alias py="python3"
+alias gl="git log --oneline"
+alias gs="git status"
+alias dn="dotnet"
+alias ls="lsd"
+alias ic="$HOME/.ssh/instanceTunnel.sh"
+alias vi="nvim"
+alias clr="clear"
+alias bat="batcat"
+alias cat="batcat"
+alias ldo="lazydocker"
+alias cld="claude"
+alias update-joplin='wget -O - https://raw.githubusercontent.com/laurent22/joplin/dev/Joplin_install_and_update.sh | bash'
 
-export GIT_SSH_COMMAND='ssh'
-
-# Load NVM into the current shell session
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-
-# Add .NET SDK and tools to PATH
-export DOTNET_ROOT="$HOME/.dotnet"
-export PATH="$HOME/.dotnet:$HOME/.dotnet/tools:$PATH"
-
-# Add rbenv
-export PATH="$HOME/.rbenv/bin:$PATH"
-eval "$(rbenv init -)"
-
-# Add zoxide
-eval "$(zoxide init zsh)"
-
-# zi preview: lsd with icons, one entry per line, folders first. This replaces
-# zoxide's default fzf options wholesale, so its defaults are repeated
-# here; {2..} is the path with the score column dropped.
-export _ZO_FZF_OPTS="
-  --height=80% --layout=reverse --border=sharp --info=inline
-  --cycle --keep-right --tabstop=1 --exit-0 --select-1
-  --bind=ctrl-z:ignore,btab:up,tab:down
-  --preview='lsd -1 --group-dirs first --color=always --icon=always {2..}'
-  --preview-window=right,50%
-"
+# ---------------------------------------------------------------------------
+# Functions
+# ---------------------------------------------------------------------------
 
 # sc -- fuzzy-jump to a tmux session via sesh (running sessions, zoxide
 # dirs, sesh.toml configs), same picker as the tmux prefix+s binding but
@@ -202,39 +161,6 @@ sc() {
 	[[ -n $session ]] || return
 	sesh connect "$session"
 }
-
-# Setup default Node Version
-function change_node_version {
-	nvmrc="./.nvmrc"
-	if [ -f "$nvmrc" ]; then
-		version="$(cat "$nvmrc")"
-		nvm use $version
-	fi
-}
-chpwd_functions+=(change_node_version)
-
-# Custom Aliases
-alias upd="sudo nala update"
-alias upg="sudo nala upgrade"
-alias autoclean="sudo apt-get autoclean"
-alias install="sudo nala install"
-alias remove="sudo nala remove --purge"
-alias -g G="| grep"
-alias py="python3"
-alias gl="git log --oneline"
-alias gs="git status"
-alias dn="dotnet"
-alias ls="lsd"
-alias n="nnn"
-alias ic="$HOME/.ssh/instanceTunnel.sh"
-alias vi="nvim"
-alias clr="clear"
-alias bat="batcat"
-alias cat="batcat"
-alias vis="v"   # previous name, kept for muscle memory
-alias ldo="lazydocker"
-alias cld="claude"
-alias update-joplin='wget -O - https://raw.githubusercontent.com/laurent22/joplin/dev/Joplin_install_and_update.sh | bash'
 
 # v -- fuzzy-find a file and open it in $EDITOR.
 #   v         search from the current directory
@@ -257,8 +183,6 @@ v() {
 	local -a files=("${(@f)out}")
 	${EDITOR:-nvim} -- "${files[@]}"
 }
-
-export OBSIDIAN_VAULT="$HOME/Documents/Obsidian Vault"
 
 # on -- fuzzy-find a note in the Obsidian vault and open it in $EDITOR.
 #   on            browse every note by title
@@ -329,7 +253,6 @@ on() {
 	fi
 }
 
-
 # Yazi Setup
 function y() {
 	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
@@ -339,19 +262,3 @@ function y() {
 	fi
 	rm -f -- "$tmp"
 }
-
-# RUST Path
-export PATH="$HOME/.cargo/bin:$PATH"
-
-# Setting Xterm
-export TERM=xterm-256color
-
-# Adding typescript language server to PATH
-export PATH="$PATH:$(npm prefix -g)/bin"
-
-# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
-export PATH="$PATH:$HOME/.rvm/bin"
-
-# Load RVM into the shell session as a function
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
-
