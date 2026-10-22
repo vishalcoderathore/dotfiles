@@ -26,6 +26,11 @@ return {
           information = { "undercurl" },
         },
       },
+      -- Catppuccin draws split separators in crust, nearly black on base.
+      -- surface2 makes the edges between panes (dap-ui boxes included) visible.
+      custom_highlights = function(colors)
+        return { WinSeparator = { fg = colors.surface2 } }
+      end,
     },
   },
 
