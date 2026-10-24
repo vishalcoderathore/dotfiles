@@ -47,7 +47,9 @@ return {
     "nvim-lualine/lualine.nvim",
     opts = function(_, opts)
       opts.options = opts.options or {}
-      opts.options.theme = "catppuccin-mocha"
+      -- "auto" loads the theme named after the active colorscheme when one
+      -- exists (catppuccin-mocha today) and generates one otherwise.
+      opts.options.theme = "auto"
       opts.options.globalstatus = true
       opts.options.component_separators = { left = "", right = "" }
       opts.options.section_separators = { left = "", right = "" }

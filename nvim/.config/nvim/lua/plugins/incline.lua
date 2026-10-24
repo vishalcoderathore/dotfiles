@@ -7,12 +7,11 @@ return {
     event = "BufReadPre",
     config = function()
       local mode_colors = require("util.mode_colors")
-      local base = mode_colors.palette().base
 
       -- The badge background is the float's Normal highlight, so repainting
       -- this single group recolors the whole rectangle, padding included.
       local function paint()
-        vim.api.nvim_set_hl(0, "InclineNormal", { bg = mode_colors.color_for_mode(), fg = base })
+        vim.api.nvim_set_hl(0, "InclineNormal", { bg = mode_colors.color_for_mode(), fg = mode_colors.background() })
       end
 
       vim.api.nvim_create_autocmd({ "ModeChanged", "ColorScheme" }, {
