@@ -6,29 +6,13 @@ return {
     "b0o/incline.nvim",
     event = "BufReadPre",
     config = function()
-      local colors = require("catppuccin.palettes").get_palette("mocha")
-
-      -- Keyed by the first character of vim.fn.mode(). The two control
-      -- characters are visual-block (Ctrl-V) and select-block (Ctrl-S).
-      local mode_colors = {
-        n = colors.blue,
-        i = colors.green,
-        v = colors.mauve,
-        V = colors.mauve,
-        ["\22"] = colors.mauve,
-        s = colors.mauve,
-        S = colors.mauve,
-        ["\19"] = colors.mauve,
-        R = colors.red,
-        c = colors.peach,
-        t = colors.green,
-      }
+      local mode_colors = require("util.mode_colors")
+      local base = mode_colors.palette().base
 
       -- The badge background is the float's Normal highlight, so repainting
       -- this single group recolors the whole rectangle, padding included.
       local function paint()
-        local bg = mode_colors[vim.fn.mode():sub(1, 1)] or colors.blue
-        vim.api.nvim_set_hl(0, "InclineNormal", { bg = bg, fg = colors.base })
+        vim.api.nvim_set_hl(0, "InclineNormal", { bg = mode_colors.color_for_mode(), fg = base })
       end
 
       vim.api.nvim_create_autocmd({ "ModeChanged", "ColorScheme" }, {
