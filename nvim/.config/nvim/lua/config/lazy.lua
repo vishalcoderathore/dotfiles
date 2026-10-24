@@ -39,6 +39,8 @@ require("lazy").setup({
   },
   -- no background update checks; run :Lazy check myself
   checker = { enabled = false },
+  -- lazy.nvim draws its window borderless by default; match the snacks pickers
+  ui = { border = "rounded" },
   performance = {
     rtp = {
       -- disable some rtp plugins
