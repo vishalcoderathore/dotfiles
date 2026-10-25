@@ -51,11 +51,13 @@ return {
       -- exists (catppuccin-mocha today) and generates one otherwise.
       opts.options.theme = "auto"
       opts.options.globalstatus = true
+      -- Rounded powerline glyphs (Nerd Font). The mode and location
+      -- components add the outer caps, so both ends of the bar are rounded.
       opts.options.component_separators = { left = "", right = "" }
-      opts.options.section_separators = { left = "", right = "" }
+      opts.options.section_separators = { left = "\u{e0b4}", right = "\u{e0b6}" }
 
       opts.sections = {
-        lualine_a = { "mode" },
+        lualine_a = { { "mode", separator = { left = "\u{e0b6}" }, right_padding = 2 } },
         lualine_b = { "branch", "diff", "diagnostics" },
         lualine_c = {
           { "filename", path = 1 },
@@ -69,6 +71,49 @@ return {
           },
         },
         lualine_x = {
+          -- Lines/chars selected in visual mode; empty otherwise.
+          "selectioncount",
+          -- [current/total] matches while a search is highlighted.
+          "searchcount",
+          -- Names of the LSP servers attached to this buffer.
+          {
+            function()
+              local names = vim.tbl_map(function(client)
+                return client.name
+              end, vim.lsp.get_clients({ bufnr = 0 }))
+              return "\u{f085} " .. table.concat(names, ", ")
+            end,
+            cond = function()
+              return #vim.lsp.get_clients({ bufnr = 0 }) > 0
+            end,
+          },
+          -- Active Python environment, as set by an activated venv, conda,
+          -- or venv-selector (from LazyVim's python extra). A venv named
+          -- ".venv" is shown by its project folder instead.
+          {
+            function()
+              local path = vim.env.VIRTUAL_ENV or vim.env.CONDA_PREFIX
+              local name = vim.fn.fnamemodify(path, ":t")
+              if name == ".venv" or name == "venv" then
+                name = vim.fn.fnamemodify(path, ":h:t")
+              end
+              return "\u{e73c} " .. name
+            end,
+            cond = function()
+              return vim.bo.filetype == "python" and (vim.env.VIRTUAL_ENV or vim.env.CONDA_PREFIX) ~= nil
+            end,
+          },
+          -- Debugger state ("Running", "Stopped at breakpoint", ...) during a
+          -- DAP session. The package.loaded check keeps this from loading
+          -- nvim-dap just to draw the statusline.
+          {
+            function()
+              return "\u{f188} " .. require("dap").status()
+            end,
+            cond = function()
+              return package.loaded["dap"] ~= nil and require("dap").status() ~= ""
+            end,
+          },
           "encoding",
           {
             "fileformat",
@@ -81,7 +126,7 @@ return {
           "filetype",
         },
         lualine_y = { "progress" },
-        lualine_z = { "location" },
+        lualine_z = { { "location", separator = { right = "\u{e0b4}" }, left_padding = 2 } },
       }
 
       return opts
