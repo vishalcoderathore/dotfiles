@@ -34,3 +34,12 @@ vim.opt.expandtab = true
 
 vim.opt.termguicolors = true
 vim.opt.wrap = false
+
+-- Neovim opens Compose files as plain yaml, but the Compose language server from
+-- the lang.docker extra only attaches to yaml.docker-compose.
+vim.filetype.add({
+  pattern = {
+    ["docker%-compose%..*ya?ml"] = "yaml.docker-compose",
+    ["compose%..*ya?ml"] = "yaml.docker-compose",
+  },
+})

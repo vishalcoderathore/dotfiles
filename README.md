@@ -23,6 +23,8 @@ I use **Homebrew** as my package manager for installing CLI tools. Below is a li
 | starship | zsh prompt (`~/.config/starship.toml`) | `brew install starship` |
 | go | Go toolchain | `brew install go` |
 | golangci-lint | Go linting, in the shell and Neovim | `brew install golangci-lint` |
+| sqlc | type-safe Go from SQL | `brew install sqlc` |
+| goose | database migrations | `brew install goose` |
 | govulncheck | Go vulnerability scanning | `brew install govulncheck` |
 
 `.zshrc` runs `zoxide init` unconditionally, so a new shell errors with `command not found: zoxide` until zoxide is installed.
@@ -99,16 +101,17 @@ nvim/.config/nvim/
 ├── after/ftplugin/go.lua   # Go: tabs, shown 4 wide
 └── lua/
     ├── config/             # options, keymaps, lazy bootstrap
-    └── plugins/            # dotnet, go, markdown, python, personal (theme/lualine/gitsigns)
+    └── plugins/            # dotnet, go, graphql, markdown, python, personal (theme/lualine/gitsigns)
 ```
 
-**Enabled extras:** `lang.typescript`, `lang.python`, `lang.go`, `lang.json`,
+**Enabled extras:** `lang.typescript`, `lang.python`, `lang.go`, `lang.docker`, `lang.json`,
 `lang.yaml`, `lang.markdown`, `linting.eslint`, `formatting.prettier`, `dap.core`, `test.core`,
 `coding.mini-surround`, `editor.inc-rename`, `ui.treesitter-context`.
 
 **Deliberate exclusions** — do not re-add without reason: OmniSharp (EasyDotnet's Roslyn is
-used instead), `neotest-vstest`, Marksman, `markdownlint-cli2`, and
-`markdown-preview.nvim` (vulnerable Socket.IO dependency tree).
+used instead), `neotest-vstest`, Marksman, `markdownlint-cli2`,
+`markdown-preview.nvim` (vulnerable Socket.IO dependency tree), and
+`graphql-language-service-cli` (high-severity npm advisories in its dependency tree).
 
 #### External tooling this config expects
 `ripgrep`, `fd`, `fzf`, `lazygit`, a C compiler (`build-essential`), Node LTS, Python 3 +
@@ -122,7 +125,7 @@ dotnet tool install -g roslyn-language-server --prerelease
 **Keymap:** `<leader>e` toggles the Snacks file explorer (LazyVim default).
 
 ### Go
-The toolchain comes from Homebrew (see the table above). Install it first,
+The toolchain and backend CLIs come from Homebrew (see the table above). Install them first,
 because Mason needs `go` to build some of its Go packages.
 
 Don't use `brew install air`: that formula is an unrelated R formatter. Install Go's
@@ -134,8 +137,16 @@ go install github.com/air-verse/air@latest
 Automatic installs are off (see `lua/lockdown.lua`), so on a new machine run these in Neovim:
 ```vim
 :Lazy install
-:MasonInstall gopls goimports gofumpt delve
-:TSInstall go gomod gowork gosum
+:MasonInstall gopls goimports gofumpt delve hadolint dockerfile-language-server docker-compose-language-service
+:TSInstall go gomod gowork gosum dockerfile graphql
+```
+
+Pin gqlgen and libraries per project, so each repo controls its own versions. `sqlc` and
+`goose` stay global, from the Homebrew table above:
+```bash
+go mod init example.com/service
+go get -tool github.com/99designs/gqlgen   # run with: go tool gqlgen
+go get github.com/jackc/pgx/v5             # Postgres driver, used by sqlc's generated code
 ```
 
 ---
