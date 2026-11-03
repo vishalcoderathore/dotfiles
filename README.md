@@ -21,6 +21,9 @@ I use **Homebrew** as my package manager for installing CLI tools. Below is a li
 | fd | `v` / `on` file pickers, yazi | `brew install fd` |
 | wl-clipboard | fzf `ctrl-y` copy (`wl-copy`) | `brew install wl-clipboard` |
 | starship | zsh prompt (`~/.config/starship.toml`) | `brew install starship` |
+| go | Go toolchain | `brew install go` |
+| golangci-lint | Go linting, in the shell and Neovim | `brew install golangci-lint` |
+| govulncheck | Go vulnerability scanning | `brew install govulncheck` |
 
 `.zshrc` runs `zoxide init` unconditionally, so a new shell errors with `command not found: zoxide` until zoxide is installed.
 
@@ -93,13 +96,15 @@ nvim/.config/nvim/
 ├── lsp/easy_dotnet.lua     # Roslyn inlay hints + Neovim file watching
 ├── lsp/pyright.lua         # point pyright at <root>/.venv/bin/python when present
 ├── after/ftplugin/cs.lua   # C#: 4-space indent, no format-on-save
+├── after/ftplugin/go.lua   # Go: tabs, shown 4 wide
 └── lua/
     ├── config/             # options, keymaps, lazy bootstrap
-    └── plugins/            # dotnet, markdown, python, personal (theme/lualine/gitsigns)
+    └── plugins/            # dotnet, go, markdown, python, personal (theme/lualine/gitsigns)
 ```
 
-**Enabled extras:** `lang.typescript`, `lang.python`, `lang.json`, `lang.yaml`,
-`lang.markdown`, `linting.eslint`, `formatting.prettier`, `dap.core`, `test.core`.
+**Enabled extras:** `lang.typescript`, `lang.python`, `lang.go`, `lang.json`,
+`lang.yaml`, `lang.markdown`, `linting.eslint`, `formatting.prettier`, `dap.core`, `test.core`,
+`coding.mini-surround`, `editor.inc-rename`, `ui.treesitter-context`.
 
 **Deliberate exclusions** — do not re-add without reason: OmniSharp (EasyDotnet's Roslyn is
 used instead), `neotest-vstest`, Marksman, `markdownlint-cli2`, and
@@ -107,7 +112,7 @@ used instead), `neotest-vstest`, Marksman, `markdownlint-cli2`, and
 
 #### External tooling this config expects
 `ripgrep`, `fd`, `fzf`, `lazygit`, a C compiler (`build-essential`), Node LTS, Python 3 +
-venv, and the .NET SDK. Language servers and formatters are managed by Mason, not installed
+venv, Go, and the .NET SDK. Language servers and formatters are managed by Mason, not installed
 globally. The C#/Blazor profile additionally uses two global .NET tools:
 ```bash
 dotnet tool install -g easydotnet
@@ -115,6 +120,23 @@ dotnet tool install -g roslyn-language-server --prerelease
 ```
 
 **Keymap:** `<leader>e` toggles the Snacks file explorer (LazyVim default).
+
+### Go
+The toolchain comes from Homebrew (see the table above). Install it first,
+because Mason needs `go` to build some of its Go packages.
+
+Don't use `brew install air`: that formula is an unrelated R formatter. Install Go's
+hot-reload tool with `go install`; `.zshrc` puts `~/go/bin` on `PATH`.
+```bash
+go install github.com/air-verse/air@latest
+```
+
+Automatic installs are off (see `lua/lockdown.lua`), so on a new machine run these in Neovim:
+```vim
+:Lazy install
+:MasonInstall gopls goimports gofumpt delve
+:TSInstall go gomod gowork gosum
+```
 
 ---
 
@@ -199,7 +221,7 @@ Firefox Developer Edition is not available in most package managers or app store
 Shell configuration managed via [Oh My Zsh](https://ohmyzsh.com) with the following setup:
 - **Prompt**: [Starship](https://starship.rs) (`~/.config/starship.toml`): minimal two-line prompt, Catppuccin Mocha colours, git branch/status on the left, project language icon + version and AWS profile on the right
 - **Plugins**: `git`, `zsh-autosuggestions`, `fast-syntax-highlighting`, `tmux`
-- **Tools integrated**: NVM, rbenv, RVM, fzf, zoxide, Homebrew, .NET SDK, Rust (cargo)
+- **Tools integrated**: NVM, rbenv, RVM, fzf, zoxide, Homebrew, .NET SDK, Rust (cargo), Go
 - **Notable aliases**: `vi` → nvim, `ls` → lsd, `cat`/`bat` → batcat, `ldo` → lazydocker, `cld` → claude
 - **Functions**:
   - `v` — fuzzy-find files (fd + fzf) and open them in `$EDITOR`

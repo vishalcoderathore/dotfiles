@@ -54,6 +54,9 @@ export PATH="$HOME/.dotnet:$HOME/.dotnet/tools:$PATH"
 # Rust
 export PATH="$HOME/.cargo/bin:$PATH"
 
+# Go: the toolchain comes from Homebrew; `go install` puts binaries in ~/go/bin
+export PATH="$HOME/go/bin:$PATH"
+
 # zoxide
 eval "$(zoxide init zsh)"
 
