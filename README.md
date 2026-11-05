@@ -104,7 +104,7 @@ nvim/.config/nvim/
     └── plugins/            # dotnet, go, graphql, markdown, python, personal (theme/lualine/gitsigns)
 ```
 
-**Enabled extras:** `lang.typescript`, `lang.python`, `lang.go`, `lang.docker`, `lang.json`,
+**Enabled extras:** `lang.typescript`, `lang.python`, `lang.go`, `lang.rust`, `lang.docker`, `lang.json`,
 `lang.yaml`, `lang.markdown`, `linting.eslint`, `formatting.prettier`, `dap.core`, `test.core`,
 `coding.mini-surround`, `editor.inc-rename`, `ui.treesitter-context`.
 
@@ -115,7 +115,7 @@ used instead), `neotest-vstest`, Marksman, `markdownlint-cli2`,
 
 #### External tooling this config expects
 `ripgrep`, `fd`, `fzf`, `lazygit`, a C compiler (`build-essential`), Node LTS, Python 3 +
-venv, Go, and the .NET SDK. Language servers and formatters are managed by Mason, not installed
+venv, Go, Rust (via rustup), and the .NET SDK. Language servers and formatters are managed by Mason, not installed
 globally. The C#/Blazor profile additionally uses two global .NET tools:
 ```bash
 dotnet tool install -g easydotnet
@@ -148,6 +148,34 @@ go mod init example.com/service
 go get -tool github.com/99designs/gqlgen   # run with: go tool gqlgen
 go get github.com/jackc/pgx/v5             # Postgres driver, used by sqlc's generated code
 ```
+
+### Rust
+The toolchain comes from [rustup](https://rustup.rs), not Homebrew or apt. `.zshrc` puts
+`~/.cargo/bin` on `PATH`.
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+rustup component add rust-analyzer clippy rustfmt
+```
+
+rust-analyzer comes from rustup, not Mason. rustaceanvim (from the `lang.rust` extra) runs the
+`rust-analyzer` on `PATH`, and the rustup copy always matches the installed toolchain. Until
+the component is added, `~/.cargo/bin/rust-analyzer` is only a proxy that fails with
+`Unknown binary 'rust-analyzer'`.
+
+Crates that link against OpenSSL (`openssl-sys`, `reqwest` with default features) also need:
+```bash
+sudo apt install pkg-config libssl-dev
+```
+
+Automatic installs are off, so on a new machine run these in Neovim. codelldb is the debug
+adapter the extra uses:
+```vim
+:Lazy install
+:MasonInstall codelldb
+:TSInstall rust ron
+```
+
+Keep the toolchain current with `rustup update` (and `rustup self update` for rustup itself).
 
 ---
 
