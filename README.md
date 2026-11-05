@@ -150,32 +150,39 @@ go get github.com/jackc/pgx/v5             # Postgres driver, used by sqlc's gen
 ```
 
 ### Rust
-The toolchain comes from [rustup](https://rustup.rs), not Homebrew or apt. `.zshrc` puts
-`~/.cargo/bin` on `PATH`.
-```bash
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-rustup component add rust-analyzer clippy rustfmt
-```
+None of the Rust tooling ships with this repo; everything below is installed separately.
+`.zshrc` puts `~/.cargo/bin` on `PATH`, which is where rustup and `cargo install` put binaries.
+
+| Tool | Used for | Install Command |
+|---|---|---|
+| rustup | toolchain manager: `rustc`, `cargo`, `rust-std`, `rust-docs` | `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \| sh` |
+| rust-analyzer | language server, started by rustaceanvim | `rustup component add rust-analyzer` |
+| clippy | lints (`cargo clippy`) | `rustup component add clippy` |
+| rustfmt | formatting (`cargo fmt`), also format-on-save in Neovim | `rustup component add rustfmt` |
+| build-essential | C compiler and linker that `rustc` links with | `sudo apt install build-essential` |
+| pkg-config | lets `*-sys` crates find system libraries | `sudo apt install pkg-config` |
+| libssl-dev | OpenSSL headers for `openssl-sys` (`reqwest` with default features) | `sudo apt install libssl-dev` |
+| cargo-nextest | faster test runner (`cargo nextest run`) | `cargo install --locked cargo-nextest` |
+| bacon | re-runs check/clippy/tests on save (`bacon`) | `cargo install --locked bacon` |
+| codelldb | debug adapter for Neovim (`lang.rust` extra) | `:MasonInstall codelldb` in Neovim |
 
 rust-analyzer comes from rustup, not Mason. rustaceanvim (from the `lang.rust` extra) runs the
 `rust-analyzer` on `PATH`, and the rustup copy always matches the installed toolchain. Until
 the component is added, `~/.cargo/bin/rust-analyzer` is only a proxy that fails with
 `Unknown binary 'rust-analyzer'`.
 
-Crates that link against OpenSSL (`openssl-sys`, `reqwest` with default features) also need:
-```bash
-sudo apt install pkg-config libssl-dev
-```
-
-Automatic installs are off, so on a new machine run these in Neovim. codelldb is the debug
-adapter the extra uses:
+Automatic installs are off, so on a new machine also run these in Neovim to fetch
+rustaceanvim, crates.nvim and the parsers:
 ```vim
 :Lazy install
-:MasonInstall codelldb
 :TSInstall rust ron
 ```
 
-Keep the toolchain current with `rustup update` (and `rustup self update` for rustup itself).
+**Updating:**
+```bash
+rustup self update && rustup update            # rustup, the toolchain and its components
+cargo install --locked cargo-nextest bacon      # cargo-installed tools; brew upgrade skips them
+```
 
 ---
 
