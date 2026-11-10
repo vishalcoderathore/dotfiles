@@ -657,21 +657,29 @@ local function queue_render()
 end
 
 -- The spinner and the timeouts need a clock; it only runs while the bar is up.
+-- `timer` is the single "is a clock running?" flag. Ticks are scheduled, so
+-- several can queue while the main loop is busy and run after their timer was
+-- torn down or replaced. Each tick therefore acts only on its own handle and
+-- does nothing once that handle is no longer the current timer.
 local function ensure_timer()
   if timer then
     return
   end
-  timer = vim.uv.new_timer()
-  timer:start(
+  local own = vim.uv.new_timer()
+  timer = own
+  own:start(
     100,
     100,
     vim.schedule_wrap(function()
+      if timer ~= own then
+        return -- stale tick: its timer was closed or replaced
+      end
       spin = spin % #SPINNER + 1
       tick = tick + 1
       render()
       if not win then
-        timer:stop()
-        timer:close()
+        own:stop()
+        own:close()
         timer = nil
       end
     end)
