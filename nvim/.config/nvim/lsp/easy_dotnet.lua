@@ -10,13 +10,4 @@ return {
       csharp_enable_inlay_hints_for_implicit_object_creation = true,
     },
   },
-  capabilities = {
-    workspace = {
-      didChangeWatchedFiles = {
-        -- Opt in to Neovim's file watcher instead of Roslyn's in-process one.
-        -- Depends on the raised fs.inotify limits; see /etc/sysctl.d/.
-        dynamicRegistration = true,
-      },
-    },
-  },
 }
