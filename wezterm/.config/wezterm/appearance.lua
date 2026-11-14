@@ -31,7 +31,7 @@ return function(config)
 		bottom = 10,
 	}
 
-	config.window_decorations = "RESIZE"
+	config.window_decorations = "NONE"
 	config.use_fancy_tab_bar = true
 	config.enable_tab_bar = false
 	config.hide_tab_bar_if_only_one_tab = false
