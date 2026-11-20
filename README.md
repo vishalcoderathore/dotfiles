@@ -14,6 +14,7 @@ I use **Homebrew** as my package manager for installing CLI tools. Below is a li
 |---|---|---|
 | lazydocker | `ldo` alias | `brew install lazydocker` |
 | yarn | JS projects | `brew install yarn` |
+| fnm | Node version manager (reads `.nvmrc` on cd) | `brew install fnm` |
 | yazi | `y` function | `brew install yazi` |
 | tmux | terminal multiplexer | `brew install tmux` |
 | zoxide | `z` jumps, sesh's folder list | `brew install zoxide` |
@@ -267,7 +268,7 @@ Firefox Developer Edition is not available in most package managers or app store
 Shell configuration managed via [Oh My Zsh](https://ohmyzsh.com) with the following setup:
 - **Prompt**: [Starship](https://starship.rs) (`~/.config/starship.toml`): minimal two-line prompt, Catppuccin Mocha colours, git branch/status on the left, project language icon + version and AWS profile on the right
 - **Plugins**: `git`, `zsh-autosuggestions`, `fast-syntax-highlighting`, `tmux`
-- **Tools integrated**: NVM, rbenv, RVM, fzf, zoxide, Homebrew, .NET SDK, Rust (cargo), Go
+- **Tools integrated**: fnm (Node), rbenv, RVM, fzf, zoxide, Homebrew, .NET SDK, Rust (cargo), Go
 - **Notable aliases**: `vi` → nvim, `ls` → lsd, `cat`/`bat` → batcat, `ldo` → lazydocker, `cld` → claude
 - **Functions**:
   - `v` — fuzzy-find files (fd + fzf) and open them in `$EDITOR`

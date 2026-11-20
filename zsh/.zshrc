@@ -33,19 +33,9 @@ source $ZSH/oh-my-zsh.sh
 # Languages and tools
 # ---------------------------------------------------------------------------
 
-# Load NVM into the current shell session
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-
-# Switch to the Node version in .nvmrc when cd-ing into a project
-function change_node_version {
-	local nvmrc="./.nvmrc" version
-	if [ -f "$nvmrc" ]; then
-		version="$(cat "$nvmrc")"
-		nvm use $version
-	fi
-}
-chpwd_functions+=(change_node_version)
+# Node via fnm; --use-on-cd switches to the version in .nvmrc / .node-version
+# when cd-ing into a project. Guarded so a machine without fnm still starts.
+(( $+commands[fnm] )) && eval "$(fnm env --use-on-cd --shell zsh)"
 
 # .NET SDK and tools
 export DOTNET_ROOT="$HOME/.dotnet"
