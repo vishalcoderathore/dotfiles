@@ -2,6 +2,10 @@ return {
   "folke/snacks.nvim",
   opts = {
     picker = {
+      sources = {
+        -- always show the list for `gr`, including the usage under the cursor
+        lsp_references = { auto_confirm = false, include_current = true },
+      },
       layout = {
         cycle = true,
         -- wide terminal: side-by-side; narrow: stacked
